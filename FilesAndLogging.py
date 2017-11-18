@@ -1,7 +1,7 @@
-# standard libs
+from datetime import datetime
 import os
+import pathlib
 
-# tensorflow
 import tensorflow as tf
 
 class CheckpointAndRestoreHelper:
@@ -34,6 +34,43 @@ class CheckpointAndRestoreHelper:
         self._saver.save(sess, self.MODEL_CKPT_PATH)
         with open(self.MODEL_EPOCH_PATH, "wb") as f:
             f.write(b"%d" % (epoch + 1))
+
+class FileManager:
+    """
+    Simple class to manage where model files will be written.
+    Creates/expects a folder structure that looks like:
+    ./models
+    ./models/<modelName>
+    ./models/<modelName>/<datetime>
+    ./models/<modelName>/<datetime>/model*
+    """
+    def __init__(self, modelName, restoreFrom=None):
+        """
+        Provide restoreFrom to reuse an existing model, this folder should contain the model files
+        in the format:
+            model.final.data-00000-of-00001, model.final.index, model.final.meta
+        """
+
+        if restoreFrom is None:
+            pathlib.Path("./models/" + modelName).mkdir(parents=True, exist_ok=True)
+            self._modelDir = "./models/" + modelName + "/" \
+                             + datetime.utcnow().strftime("%Y%m%d-%H%M")
+        else:
+            self._modelDir = "./models/" + modelName + "/" + restoreFrom
+
+    def getModelDir(self):
+        """
+        Returns the directory of the model
+        eg: models/Seq2SeqRegressor-X-200-H-50_30_10-I-he-D-None/20171116-2329
+        """
+        return self._modelDir
+
+    def getModelDirAndPrefix(self):
+        """
+        Returns the model directory with the file prefix
+        eg: models/Seq2SeqRegressor-X-200-H-50_30_10-I-he-D-None/20171116-2329/model
+        """
+        return self._modelDir + "/model"
 
 class TensorboardLogHelper:
     """

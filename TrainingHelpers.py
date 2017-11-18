@@ -1,7 +1,5 @@
-# the usual tools
 import numpy as np
 
-# tensorflow
 import tensorflow as tf
 
 class EarlyStoppingHelper:

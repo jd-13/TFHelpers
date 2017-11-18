@@ -1,3 +1,3 @@
-from FilesAndLogging import CheckpointAndRestoreHelper, TensorboardLogHelper
-from ScikitWrapper import SKTFWrapper
+from FilesAndLogging import CheckpointAndRestoreHelper, FileManager, TensorboardLogHelper
+from ScikitWrapper import SKTFWrapper, Tensors, TFRegressor
 from TrainingHelpers import EarlyStoppingHelper
