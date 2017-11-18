@@ -30,7 +30,7 @@ class SKTFWrapper(BaseEstimator, RegressorMixin):
         if self._session:
             self._session.close()
 
-class Tensors:
+class RegressorTensors:
     """
     Derived classes of TFRegressor must provide this member, it is the interface between the
     training loop of TFRegressor and the derived class
