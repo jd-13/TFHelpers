@@ -101,7 +101,10 @@ class TensorboardLogHelper:
         Provide a session and a list of values that correspond to the summary names this object
         was initialised with.
         """
-        assert len(summaryValues) == len(self._summaryPlaceholders)
+        if len(summaryValues) is not len(self._summaryPlaceholders):
+            raise ValueError("Number of summary values provided ({0}) does not match the number of,\
+                              summary names ({1}) this object was initialised with".format(
+                                  len(summaryValues), len(self._summaryPlaceholders)))
 
         feed_dict = {placeholder: value
                      for placeholder, value in zip(self._summaryPlaceholders, summaryValues)}

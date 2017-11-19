@@ -12,18 +12,30 @@ from FilesAndLogging import CheckpointAndRestoreHelper, FileManager, Tensorboard
 from TrainingHelpers import EarlyStoppingHelper, ProgressCalculator
 
 class SKTFWrapper(BaseEstimator, RegressorMixin):
-    """Doesn't actually do anything, just provides some common functionality used for wrapping TF
-    models in an sklearn API"""
+    """
+    Doesn't actually do anything, just provides some common functionality used for wrapping TF
+    models in an sklearn API.
+
+    You must implement the constructor, fit, and predict methods.
+    """
 
     _session = None
 
     def fit(self, X, y, X_valid, y_valid):
-        """Build and train the graph here"""
-        pass
+        """
+        Build and train the graph here
+
+        ** Derived classes should implement this **
+        """
+        raise NotImplementedError()
 
     def predict(self, X):
-        """Return predictions here"""
-        pass
+        """
+        Return predictions here
+        
+        ** Derived classes should implement this **
+        """
+        raise NotImplementedError()
 
     def _closeSession(self):
         """Ends the tensorflow session if one is open"""
@@ -51,7 +63,15 @@ class RegressorTensors:
         self.dropoutKeepProb = dropoutKeepProb
 
 class TFRegressor(SKTFWrapper):
-    """Provides functionality that is common to TF regression models"""
+    """
+    Provides functionality that is common to TF regression models, mainly the training loop.
+
+    Derived classes must:
+    - Provide a constructor which calls the constructor of this class
+    - Implement a _buildGraph method which assigns a RegressorTensors object to the _tensors member
+    - Implement a _buildModelName method which returns a url/filename safe string describing the
+      model type and its hyperparameters
+    """
 
     def __init__(self,
                  learningRate,
@@ -73,6 +93,23 @@ class TFRegressor(SKTFWrapper):
         self._tensors = None
 
         self._previousTrainables = None
+
+    def _buildGraph(self, numFeatures):
+        """
+        Build the graph and set the _tensors member to a RegressorTensors object which contains the
+        important tensors for the graph
+
+        ** Derived classes should implement this **
+        """
+        raise NotImplementedError()
+
+    def _buildModelName(self):
+        """
+        Return a url/filename safe string describing the model type and its hyperparameters
+
+        ** Derived classes should implement this **
+        """
+        raise NotImplementedError()
 
     def fit(self, X, y, X_valid, y_valid, numEpochs=2):
         """Fits the model on the training set"""
@@ -136,7 +173,7 @@ class TFRegressor(SKTFWrapper):
                     if self._previousTrainables is not None:
                         for previousVariable, currentVariable in zip(self._previousTrainables, currentTrainables):
                             if (previousVariable == currentVariable).any():
-                                sys.exit("Not all variables have been trained")
+                                raise RuntimeError("Not all variables have been trained")
 
                     self._previousTrainables = currentTrainables
 
@@ -151,18 +188,12 @@ class TFRegressor(SKTFWrapper):
         print("Time taken:", progressCalc.timeTaken())
 
     def predict(self, X):
-        """Returns the model's predictions for y"""
+        """Returns the model's predictions for the provided data"""
         if not self._session:
             raise NotFittedError("This", self.__class__.__name__, "instance is not fitted yet")
 
         with self._session.as_default():
             return self._tensors.logits.eval(feed_dict={self._tensors.X_in: X})
-
-    def _buildGraph(self, numFeatures):
-        pass
-
-    def _buildModelName(self):
-        pass
 
     def _evalLossBatched(self, X, y):
         """Do validation in batches in case the dataset would need 10's of GB"""
