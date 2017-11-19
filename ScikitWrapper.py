@@ -9,7 +9,7 @@ from sklearn.exceptions import NotFittedError
 import tensorflow as tf
 
 from FilesAndLogging import CheckpointAndRestoreHelper, FileManager, TensorboardLogHelper
-from TrainingHelpers import EarlyStoppingHelper
+from TrainingHelpers import EarlyStoppingHelper, ProgressCalculator
 
 class SKTFWrapper(BaseEstimator, RegressorMixin):
     """Doesn't actually do anything, just provides some common functionality used for wrapping TF
@@ -86,6 +86,7 @@ class TFRegressor(SKTFWrapper):
                                                      ["LossTrain", "LossVal", "BatchTimeAvg"])
 
         stoppingHelper = EarlyStoppingHelper()
+        progressCalc = ProgressCalculator(numEpochs)
         restoreHelper = CheckpointAndRestoreHelper(self._fileManager.getModelDirAndPrefix(),
                                                    self._tensors.saver)
 
@@ -98,6 +99,7 @@ class TFRegressor(SKTFWrapper):
 
             self._tensors.init.run()
 
+            progressCalc.start()
             for epoch in range(startEpoch, numEpochs):
                 randomIndicies = np.random.permutation(len(X))
                 NUM_BATCHES = len(X) // self._batchSize
@@ -121,7 +123,8 @@ class TFRegressor(SKTFWrapper):
                 lossTrain = self._tensors.loss.eval(feed_dict=feed_dict)
                 lossVal = self._evalLossBatched(X_valid, y_valid)
                 tensorboardHelper.writeSummary(sess, [lossTrain, lossVal, np.average(batchTimes)])
-                print("Epoch:", epoch, "Validation loss:", lossVal)
+                progressCalc.updateInterval(1)
+                print("Epoch:", epoch, "Validation loss:", lossVal, "Time Remaining:", progressCalc.getTimeStampRemaining())
 
                 restoreHelper.saveCheckpoint(sess, epoch)
 
@@ -144,6 +147,8 @@ class TFRegressor(SKTFWrapper):
 
             stoppingHelper.restoreBestModelParams()
             tensorboardHelper.close()
+        
+        print("Time taken:", progressCalc.timeTaken())
 
     def predict(self, X):
         """Returns the model's predictions for y"""

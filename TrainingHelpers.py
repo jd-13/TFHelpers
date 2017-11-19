@@ -1,3 +1,6 @@
+import datetime
+import time
+
 import numpy as np
 
 import tensorflow as tf
@@ -49,3 +52,52 @@ class EarlyStoppingHelper:
 
         return self.checksSinceLastProgress > self.MAX_CHECKS_WITHOUT_PROGRESS
 
+class ProgressCalculator:
+    """
+    Provided a number of iterations, if updateInterval is called on completion of each iteration
+    then the time to complete the remaining iterations is calculated.
+    """
+    _deltaPerSecond = 0
+    _progress = 0
+    _target = 0
+    _startEpoch = 0
+
+    def __init__(self, targetCount):
+        self._target = targetCount
+
+    def start(self):
+        """Records the current time as the time when the first iteration started."""
+        self._startEpoch = time.time()
+
+    def reset(self):
+        """Reset the timer and all internal counters"""
+        self._deltaPerSecond = 0
+        self._progress = 0
+        self._target = 0
+        self._startEpoch = 0
+
+    def updateInterval(self, newlyCompletedIterations):
+        """
+        Increment the completed iterations by the provided amount and recalculate the time per
+        iteration.
+        """
+        self._progress += newlyCompletedIterations
+
+        timeSinceStart = time.time() - self._startEpoch
+        self._deltaPerSecond = self._progress / timeSinceStart
+
+    def getSecondsRemaining(self):
+        """Predict the time to complete the remaining iterations"""
+        try:
+            return (self._target - self._progress) / self._deltaPerSecond
+        except ZeroDivisionError:
+            return 0
+
+    def getTimeStampRemaining(self):
+        timestamp = datetime.timedelta(seconds=self.getSecondsRemaining())
+        return str(timestamp)
+
+    def timeTaken(self):
+        timeSinceStart = time.time() - self._startEpoch
+        timestamp = datetime.timedelta(seconds=timeSinceStart)
+        return str(timestamp)
