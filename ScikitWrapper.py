@@ -147,7 +147,7 @@ class TFRegressor(SKTFWrapper):
 
             stoppingHelper.restoreBestModelParams()
             tensorboardHelper.close()
-        
+
         print("Time taken:", progressCalc.timeTaken())
 
     def predict(self, X):
