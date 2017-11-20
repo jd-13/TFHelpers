@@ -1,3 +1,7 @@
+"""
+Utilities that are useful during the training phase, such calculating the time remaining and early
+stopping.
+"""
 import datetime
 import time
 
