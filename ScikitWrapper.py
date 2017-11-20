@@ -216,5 +216,7 @@ class TFRegressor(SKTFWrapper):
         initString = "None"
         if "variance_scaling_initializer" in str(self._initializer):
             initString = "he"
+        elif "xavier_initializer" in str(self._initializer):
+            initString = "xa"
 
         return initString
