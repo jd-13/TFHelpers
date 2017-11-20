@@ -79,10 +79,15 @@ class TFRegressor(SKTFWrapper):
                  initializer,
                  dropoutRate,
                  restoreFrom):
-        self._learningRate = learningRate
-        self._batchSize = batchSize
-        self._initializer = initializer
-        self._dropoutRate = dropoutRate
+
+        # Scikit-learn's api demands that parameters in the constructor are assigned to members with
+        # exactly the same name otherwise its clone method sets everything to None
+        # (see BaseEstimator::get_params)
+        self.learningRate = learningRate
+        self.batchSize = batchSize
+        self.initializer = initializer
+        self.dropoutRate = dropoutRate
+        self.restoreFrom = restoreFrom
 
         self._session = None
         self._graph = tf.Graph()
@@ -139,7 +144,7 @@ class TFRegressor(SKTFWrapper):
             progressCalc.start()
             for epoch in range(startEpoch, numEpochs):
                 randomIndicies = np.random.permutation(len(X))
-                NUM_BATCHES = len(X) // self._batchSize
+                NUM_BATCHES = len(X) // self.batchSize
 
                 batchTimes = []
                 for batchNumber, batchIndicies in enumerate(np.array_split(randomIndicies, NUM_BATCHES)):
@@ -149,7 +154,7 @@ class TFRegressor(SKTFWrapper):
 
                     feed_dict = {self._tensors.X_in: X_batch,
                                  self._tensors.y_in: y_batch,
-                                 self._tensors.dropoutKeepProb: 1 - self._dropoutRate}
+                                 self._tensors.dropoutKeepProb: 1 - self.dropoutRate}
 
                     sess.run(self._tensors.trainingOp, feed_dict=feed_dict)
 
@@ -197,7 +202,7 @@ class TFRegressor(SKTFWrapper):
 
     def _evalLossBatched(self, X, y):
         """Do validation in batches in case the dataset would need 10's of GB"""
-        NUM_BATCHES = len(X) // self._batchSize
+        NUM_BATCHES = len(X) // self.batchSize
         indicies = np.arange(len(X))
         losses = np.zeros(len(X))
 
@@ -214,9 +219,9 @@ class TFRegressor(SKTFWrapper):
         """Maps initializer types to a short string suitable for the model's file name"""
 
         initString = "None"
-        if "variance_scaling_initializer" in str(self._initializer):
+        if "variance_scaling_initializer" in str(self.initializer):
             initString = "he"
-        elif "xavier_initializer" in str(self._initializer):
+        elif "xavier_initializer" in str(self.initializer):
             initString = "xa"
 
         return initString
