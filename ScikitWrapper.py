@@ -21,7 +21,7 @@ class SKTFWrapper(BaseEstimator, RegressorMixin):
 
     _session = None
 
-    def fit(self, X, y, X_valid, y_valid):
+    def fit(self, X, y, X_valid, y_valid, numEpochs=1):
         """
         Build and train the graph here
 
@@ -111,7 +111,7 @@ class TFRegressor(SKTFWrapper):
         """
         raise NotImplementedError()
 
-    def fit(self, X, y, X_valid, y_valid, numEpochs=2):
+    def fit(self, X, y, X_valid, y_valid, numEpochs=1):
         """Fits the model on the training set"""
         self._closeSession()
 
