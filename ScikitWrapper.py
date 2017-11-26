@@ -171,7 +171,8 @@ class TFRegressor(SKTFWrapper):
                 lossVal = self._evalLossBatched(X_valid, y_valid)
                 tensorboardHelper.writeSummary(sess, [lossTrain, lossVal, np.average(batchTimes)])
                 progressCalc.updateInterval(1)
-                print("Epoch:", epoch, "Validation loss:", lossVal, "Time Remaining:", progressCalc.getTimeStampRemaining())
+                print("Epoch: {0}\tValidation loss: {1}\tTime Remaining: {2}".format(
+                    epoch, lossVal, progressCalc.getTimeStampRemaining()))
 
                 restoreHelper.saveCheckpoint(sess, epoch)
 
