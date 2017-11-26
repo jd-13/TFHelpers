@@ -1,4 +1,3 @@
-import sys
 import time
 
 import numpy as np
@@ -78,7 +77,8 @@ class TFRegressor(SKTFWrapper):
                  batchSize,
                  initializer,
                  dropoutRate,
-                 restoreFrom):
+                 restoreFrom,
+                 outputLength):
 
         # Scikit-learn's api demands that parameters in the constructor are assigned to members with
         # exactly the same name otherwise its clone method sets everything to None
@@ -88,11 +88,12 @@ class TFRegressor(SKTFWrapper):
         self.initializer = initializer
         self.dropoutRate = dropoutRate
         self.restoreFrom = restoreFrom
+        self.outputLength = outputLength
 
         self._session = None
         self._graph = tf.Graph()
 
-        self._fileManager = FileManager(self._buildModelName(), restoreFrom)
+        self._fileManager = None
         self._allowRestore = restoreFrom is not None
 
         self._tensors = None
@@ -119,6 +120,10 @@ class TFRegressor(SKTFWrapper):
     def fit(self, X, y, X_valid, y_valid, numEpochs=1):
         """Fits the model on the training set"""
         self._closeSession()
+        
+        # This must be initialised during fit for sklearn's grid search to call it at the correct
+        # time
+        self._fileManager = FileManager(self._buildModelName(), self.restoreFrom)
 
         with self._graph.as_default():
             self._buildGraph(X.shape[1])
@@ -172,13 +177,13 @@ class TFRegressor(SKTFWrapper):
 
                 # Check if all variables are being trained
                 if epoch < 2:
-                    currentTrainables = sess.run(
-                        self._graph.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
+                    variableNames = self._graph.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+                    currentTrainables = sess.run(variableNames)
 
                     if self._previousTrainables is not None:
-                        for previousVariable, currentVariable in zip(self._previousTrainables, currentTrainables):
+                        for previousVariable, currentVariable, name in zip(self._previousTrainables, currentTrainables, variableNames):
                             if (previousVariable == currentVariable).any():
-                                raise RuntimeError("Not all variables have been trained")
+                                print("Not all variables have been trained: {0}".format(name))
 
                     self._previousTrainables = currentTrainables
 
@@ -197,8 +202,20 @@ class TFRegressor(SKTFWrapper):
         if not self._session:
             raise NotFittedError("This", self.__class__.__name__, "instance is not fitted yet")
 
+        BATCH_SIZE = self.batchSize
+        if len(X) < self.batchSize:
+            BATCH_SIZE = len(X)
+
+        NUM_BATCHES = len(X) // BATCH_SIZE
+        indicies = np.arange(len(X))
+        predictions = np.zeros((X.shape[0], self.outputLength))
+
         with self._session.as_default():
-            return self._tensors.logits.eval(feed_dict={self._tensors.X_in: X})
+            for batchIndicies in np.array_split(indicies, NUM_BATCHES):
+                X_batch = X[batchIndicies, :]
+                predictions[batchIndicies, :] = self._tensors.logits.eval(feed_dict={self._tensors.X_in: X_batch})
+
+        return predictions
 
     def _evalLossBatched(self, X, y):
         """Do validation in batches in case the dataset would need 10's of GB"""
