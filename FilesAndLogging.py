@@ -56,25 +56,24 @@ class FileManager:
         """
 
         if restoreFrom is None:
-            pathlib.Path("./models/" + modelName).mkdir(parents=True, exist_ok=True)
-            self._modelDir = "./models/" + modelName + "/" \
-                             + datetime.utcnow().strftime("%Y%m%d-%H%M")
+            self._modelDir = pathlib.Path.cwd() / "models" / modelName / datetime.utcnow().strftime("%Y%m%d-%H%M")
+            self._modelDir.mkdir(parents=True, exist_ok=True)
         else:
-            self._modelDir = "./models/" + modelName + "/" + restoreFrom
+            self._modelDir = pathlib.Path.cwd() / "models" / modelName / restoreFrom
 
     def getModelDir(self):
         """
         Returns the directory of the model
         eg: models/Seq2SeqRegressor-X-200-H-50_30_10-I-he-D-None/20171116-2329
         """
-        return self._modelDir
+        return str(self._modelDir)
 
     def getModelDirAndPrefix(self):
         """
         Returns the model directory with the file prefix
         eg: models/Seq2SeqRegressor-X-200-H-50_30_10-I-he-D-None/20171116-2329/model
         """
-        return self._modelDir + "/model"
+        return str(self._modelDir) + "model"
 
 class TensorboardLogHelper:
     """
