@@ -31,7 +31,7 @@ class SKTFWrapper(BaseEstimator, RegressorMixin):
     def predict(self, X):
         """
         Return predictions here
-        
+
         ** Derived classes should implement this **
         """
         raise NotImplementedError()
@@ -40,7 +40,7 @@ class SKTFWrapper(BaseEstimator, RegressorMixin):
         """Ends the tensorflow session if one is open"""
         if self._session:
             self._session.close()
-    
+
     def _mapInitializerName(self):
         """Maps initializer types to a short string suitable for the model's file name"""
 
