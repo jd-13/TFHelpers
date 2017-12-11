@@ -40,6 +40,17 @@ class SKTFWrapper(BaseEstimator, RegressorMixin):
         """Ends the tensorflow session if one is open"""
         if self._session:
             self._session.close()
+    
+    def _mapInitializerName(self):
+        """Maps initializer types to a short string suitable for the model's file name"""
+
+        initString = "None"
+        if "variance_scaling_initializer" in str(self.initializer):
+            initString = "he"
+        elif "xavier_initializer" in str(self.initializer):
+            initString = "xa"
+
+        return initString
 
 class RegressorTensors:
     """
@@ -232,14 +243,3 @@ class TFRegressor(SKTFWrapper):
                                                                        self._tensors.y_in: y_batch})
 
         return np.average(losses)
-
-    def _mapInitializerName(self):
-        """Maps initializer types to a short string suitable for the model's file name"""
-
-        initString = "None"
-        if "variance_scaling_initializer" in str(self.initializer):
-            initString = "he"
-        elif "xavier_initializer" in str(self.initializer):
-            initString = "xa"
-
-        return initString
