@@ -73,7 +73,7 @@ class FileManager:
         Returns the model directory with the file prefix
         eg: models/Seq2SeqRegressor-X-200-H-50_30_10-I-he-D-None/20171116-2329/model
         """
-        return str(self._modelDir) + "model"
+        return str(self._modelDir / "model")
 
 class TensorboardLogHelper:
     """
