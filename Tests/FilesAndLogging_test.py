@@ -5,7 +5,7 @@ Tests for functionality in the FilesAndLogging module.
 from datetime import datetime
 import os
 
-from TFHelpers import FileManager
+from TFHelpers.FilesAndLogging import FileManager
 
 class Test_FileManagerTests:
     """

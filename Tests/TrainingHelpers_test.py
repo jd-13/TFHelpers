@@ -4,7 +4,7 @@ Tests for functionality in the TrainingHelpers module.
 
 import pytest
 
-from TFHelpers import ProgressCalculator
+from TFHelpers.TrainingHelpers import ProgressCalculator
 
 class Test_ProgressCalculator:
     """

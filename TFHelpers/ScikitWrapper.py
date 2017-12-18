@@ -7,8 +7,8 @@ from sklearn.exceptions import NotFittedError
 
 import tensorflow as tf
 
-from FilesAndLogging import CheckpointAndRestoreHelper, FileManager, TensorboardLogHelper
-from TrainingHelpers import EarlyStoppingHelper, ProgressCalculator
+from TFHelpers.FilesAndLogging import CheckpointAndRestoreHelper, FileManager, TensorboardLogHelper
+from TFHelpers.TrainingHelpers import EarlyStoppingHelper, ProgressCalculator
 
 class SKTFWrapper(BaseEstimator, RegressorMixin):
     """
