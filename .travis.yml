@@ -14,6 +14,7 @@ install:
 before_script:
 
 script:
-  - docker run --mount type=bind,source="$(pwd)",target=/home/travisDir $DOCKER_IMG /bin/bash -c "cd /home/travisDir && pytest"
+  - CODE_COV_ENVS=`bash <(curl -s https://codecov.io/env)`
+  - docker run --mount type=bind,source="$(pwd)",target=/home/travisDir $CODE_COV_ENVS $DOCKER_IMG /bin/bash -c "cd /home/travisDir && pytest && bash <(curl -s https://codecov.io/bash)"
 
 after_success:
