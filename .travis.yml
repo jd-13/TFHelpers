@@ -1,0 +1,19 @@
+language: python
+
+sudo: required
+
+services:
+  - docker
+
+env:
+  - DOCKER_IMG=jackd13/machinelearning:tensorflow14
+
+install:
+  - docker pull $DOCKER_IMG
+
+before_script:
+
+script:
+  - docker run --mount type=bind,source="$(pwd)",target=/home/travisDir $DOCKER_IMG /bin/bash -c "cd /home/travisDir && pytest"
+
+after_success:
