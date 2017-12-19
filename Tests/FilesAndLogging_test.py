@@ -7,7 +7,7 @@ import os
 
 from TFHelpers.FilesAndLogging import FileManager
 
-class Test_FileManagerTests:
+class Test_FileManager:
     """
     Tests for the FileManager class.
     """
