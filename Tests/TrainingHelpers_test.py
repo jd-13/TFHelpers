@@ -5,7 +5,9 @@ Tests for functionality in the TrainingHelpers module.
 import time
 import pytest
 
-from TFHelpers.TrainingHelpers import ProgressCalculator
+import tensorflow as tf
+
+from TFHelpers.TrainingHelpers import ProgressCalculator, EarlyStoppingHelper
 
 class Test_ProgressCalculator_InvalidBehaviour:
     """
@@ -165,3 +167,92 @@ class Test_ProgressCalculator_Operation:
         progress.updateInterval(1)
         assert progress.getTimeStampRemaining() == "0:00:00"
         assert progress.getSecondsRemaining() == pytest.approx(0, 0.1)
+
+class Test_EarlyStoppingHelper:
+    """
+    Tests that the EarlyStoppingHelper is able to signal when to stop and restore the correct model
+    parameters.
+    """
+
+    def test_StopAndRestore_Plateau(self):
+        """
+        Simulates a decreasing loss for several iterations, then a loss which does not change. The
+        helper should signal the need to stop after the correct number of iterations.
+        """
+        stoppingHelper = EarlyStoppingHelper(3)
+
+        # Lets add some basic operators to the graph
+        A = tf.Variable(10, dtype=tf.float32)
+        B = tf.Variable(15, dtype=tf.float32)
+        init = tf.global_variables_initializer()
+
+        # And some ops so that we can mess with the variables
+        A_mod = A.assign(5)
+        B_mod = B.assign(5)
+
+        with tf.Session() as sess:
+            init.run()
+
+            assert not stoppingHelper.shouldStop(10)
+            assert not stoppingHelper.shouldStop(9)
+            assert not stoppingHelper.shouldStop(8)
+            assert not stoppingHelper.shouldStop(7)
+
+            # Now modify A while the loss is lowest
+            A_mod.eval()
+            assert not stoppingHelper.shouldStop(6)
+            assert not stoppingHelper.shouldStop(6)
+
+            # And modify B while the loss is the same
+            B_mod.eval()
+            assert not stoppingHelper.shouldStop(6)
+            assert not stoppingHelper.shouldStop(6)
+            assert stoppingHelper.shouldStop(6)
+
+            # When we restore the parameters A should retain the modified value, and B should be
+            # reset
+            stoppingHelper.restoreBestModelParams()
+            assert A.eval() == 5
+            assert B.eval() == 15
+
+    def test_StopAndRestore_Increasing(self):
+        """
+        Simulates a decreasing loss for several iterations, then a loss which increases. The 
+        helper should signal the need to stop after the correct number of iterations.
+        """
+        stoppingHelper = EarlyStoppingHelper(3)
+
+        # Lets add some basic operators to the graph
+        A = tf.Variable(10, dtype=tf.float32)
+        B = tf.Variable(15, dtype=tf.float32)
+        init = tf.global_variables_initializer()
+
+        # And some ops so that we can mess with the variables
+        A_mod = A.assign(5)
+        B_mod = B.assign(5)
+
+        with tf.Session() as sess:
+            init.run()
+
+            assert not stoppingHelper.shouldStop(10)
+            assert not stoppingHelper.shouldStop(9)
+            assert not stoppingHelper.shouldStop(8)
+            assert not stoppingHelper.shouldStop(7)
+
+            # Now modify A while the loss is lowest
+            A_mod.eval()
+            assert not stoppingHelper.shouldStop(6)
+            assert not stoppingHelper.shouldStop(7)
+            assert not stoppingHelper.shouldStop(8)
+
+            # And modify B while the loss is a little higher
+            B_mod.eval()
+            assert not stoppingHelper.shouldStop(9)
+
+            assert stoppingHelper.shouldStop(10)
+
+            # When we restore the parameters A should retain the modified value, and B should be
+            # reset
+            stoppingHelper.restoreBestModelParams()
+            assert A.eval() == 5
+            assert B.eval() == 15
