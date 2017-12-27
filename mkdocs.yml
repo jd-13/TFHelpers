@@ -1,0 +1,9 @@
+site_name: TFHelpers
+
+pages:
+  - Home: index.md
+  - Modules:
+    - SKTFModels: SKTFModels.md
+    - Scikit-learn Wrapper: ScikitLearnWrapper.md
+    - TrainingHelpers: TrainingHelpers.md
+    - FilesAndLogging: FilesAndLogging.md
