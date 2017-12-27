@@ -12,7 +12,6 @@ install:
   - docker pull $DOCKER_IMG
 
 before_script:
-  - mkdocs gh-deploy
 
 script:
   - CODE_COV_ENVS=`bash <(curl -s https://codecov.io/env)`
