@@ -1,0 +1,59 @@
+{
+    "docs": [
+        {
+            "location": "/",
+            "text": "TFHelpers\n\n\nTFHelpers is a small collection of classes which implement common tasks in Tensorflow. The\nfunctionality provided by each module is described in this documentation.\n\n\nThe modules \nFilesAndLogging\n and \nTrainingHelpers\n provide functionality such as managing model\nfiles and early stopping, and may be useful in many tensorflow models. The module \nScikitWrapper\n\nprovides several classes which aid with implementing tensorflow models behind a scikit-learn style\nAPI.",
+            "title": "Home"
+        },
+        {
+            "location": "/#tfhelpers",
+            "text": "TFHelpers is a small collection of classes which implement common tasks in Tensorflow. The\nfunctionality provided by each module is described in this documentation.  The modules  FilesAndLogging  and  TrainingHelpers  provide functionality such as managing model\nfiles and early stopping, and may be useful in many tensorflow models. The module  ScikitWrapper \nprovides several classes which aid with implementing tensorflow models behind a scikit-learn style\nAPI.",
+            "title": "TFHelpers"
+        },
+        {
+            "location": "/SKTFModels/",
+            "text": "SKTFModels\n\n\nThis module provides examples of models built using the \nSciKitWrapper\n module. This is a good place\nto start if you wish to implement your own models using this wrapper.\n\n\nCurrently this module provides only the \nBasicRegressor\n class, which inherits from \nTFRegressor\n\nand implements a basic multilayer feedforward network for regressions.",
+            "title": "SKTFModels"
+        },
+        {
+            "location": "/SKTFModels/#sktfmodels",
+            "text": "This module provides examples of models built using the  SciKitWrapper  module. This is a good place\nto start if you wish to implement your own models using this wrapper.  Currently this module provides only the  BasicRegressor  class, which inherits from  TFRegressor \nand implements a basic multilayer feedforward network for regressions.",
+            "title": "SKTFModels"
+        },
+        {
+            "location": "/ScikitLearnWrapper/",
+            "text": "Scikit-learn Wrapper\n\n\nTFHelpers provides a basic wrapper class which you can inherit from to create models which are\ncompatible with the scikit-learn api. Models which inherit from the \nSKTFWrapper\n class will be\ncompatible scikit-learn functionality such as \nGridSearchCV\n, and will provide \nfit\n and \npredict\n\nmethods for training and producing predictions.\n\n\nIf you inherit from \nSKTFWrapper\n you will need to build the graph and implement the the training\nloop in the \nfit\n method. The \nSciKitWrapper\n module will also contain child classes of\n\nSKTFWrapper\n which provide further functionality. Currently only \nTFRegressor\n is available.\n\n\nTFRegressor\n\n\nIf you wish to create a regression model you can inherit for the \nTFRegressor\n class which provides\na lot of functionality, leaving the methods \n_buildGraph\n and \n_buildModelName\n for you to\nimplement.\n\n\nTFRegressor\n gives you the following features for free:\n\n A fairly conventional training loop, with user specified batch size\n\n Logging of training and validation losses to tensorboard on each epoch, as well as writing any \ntf.Summary\n nodes at each epoch\n\n Saving the model at each epoch\n\n Continuing training from previous runs\n\n Saving all model and tensorboard related files in separate directories, sorted by model hyperparameters and start time\n\n Early stopping\n\n Predicted time to completion\n\n Warnings if parts of the graph do not appear to be training\n\n\nIn the \n_buildGraph\n method you will need to build the graph for your model, and set the \n_tensors\n\ndata member.\n\n\nIn the \n_buildModelName\n method you will need to return a string which adequately\ndescribes your model and its hyperparameters. This string is used to group model files.\n\n\nSee \nBasicRegressor\n for an example.",
+            "title": "Scikit-learn Wrapper"
+        },
+        {
+            "location": "/ScikitLearnWrapper/#scikit-learn-wrapper",
+            "text": "TFHelpers provides a basic wrapper class which you can inherit from to create models which are\ncompatible with the scikit-learn api. Models which inherit from the  SKTFWrapper  class will be\ncompatible scikit-learn functionality such as  GridSearchCV , and will provide  fit  and  predict \nmethods for training and producing predictions.  If you inherit from  SKTFWrapper  you will need to build the graph and implement the the training\nloop in the  fit  method. The  SciKitWrapper  module will also contain child classes of SKTFWrapper  which provide further functionality. Currently only  TFRegressor  is available.",
+            "title": "Scikit-learn Wrapper"
+        },
+        {
+            "location": "/ScikitLearnWrapper/#tfregressor",
+            "text": "If you wish to create a regression model you can inherit for the  TFRegressor  class which provides\na lot of functionality, leaving the methods  _buildGraph  and  _buildModelName  for you to\nimplement.  TFRegressor  gives you the following features for free:  A fairly conventional training loop, with user specified batch size  Logging of training and validation losses to tensorboard on each epoch, as well as writing any  tf.Summary  nodes at each epoch  Saving the model at each epoch  Continuing training from previous runs  Saving all model and tensorboard related files in separate directories, sorted by model hyperparameters and start time  Early stopping  Predicted time to completion  Warnings if parts of the graph do not appear to be training  In the  _buildGraph  method you will need to build the graph for your model, and set the  _tensors \ndata member.  In the  _buildModelName  method you will need to return a string which adequately\ndescribes your model and its hyperparameters. This string is used to group model files.  See  BasicRegressor  for an example.",
+            "title": "TFRegressor"
+        },
+        {
+            "location": "/TrainingHelpers/",
+            "text": "TrainingHelpers\n\n\nClasses which provide functionality within the training loop of a tensorflow model.",
+            "title": "TrainingHelpers"
+        },
+        {
+            "location": "/TrainingHelpers/#traininghelpers",
+            "text": "Classes which provide functionality within the training loop of a tensorflow model.",
+            "title": "TrainingHelpers"
+        },
+        {
+            "location": "/FilesAndLogging/",
+            "text": "FilesAndLogging\n\n\nSeveral classes which assist with managing model files and creating tensorboard logs.",
+            "title": "FilesAndLogging"
+        },
+        {
+            "location": "/FilesAndLogging/#filesandlogging",
+            "text": "Several classes which assist with managing model files and creating tensorboard logs.",
+            "title": "FilesAndLogging"
+        }
+    ]
+}
