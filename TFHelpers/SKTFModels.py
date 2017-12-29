@@ -46,6 +46,15 @@ class BasicRegressor(TFRegressor):
                                               numNeurons,
                                               kernel_initializer=self.initializer)
 
+            # Create histogram summaries
+            for layer in range(len(self.hiddenNeuronsList)):
+                path = "dense" if layer == 0 else "dense_{0}".format(layer)
+
+                tf.summary.histogram("dense_{0}/kernel".format(layer),
+                                     tf.get_default_graph().get_tensor_by_name(path + "/kernel:0"))
+                tf.summary.histogram("dense_{0}/bias".format(layer),
+                                     tf.get_default_graph().get_tensor_by_name(path + "/bias:0"))
+
             logits = tf.layers.dense(layerOutput, units=1, kernel_initializer=self.initializer)
 
         with tf.name_scope("loss"):
