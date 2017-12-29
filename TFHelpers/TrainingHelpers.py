@@ -4,6 +4,7 @@ stopping.
 """
 import datetime
 import time
+from typing import Any, Dict
 
 import numpy as np
 
@@ -12,20 +13,20 @@ import tensorflow as tf
 class EarlyStoppingHelper:
     """Contains most of the functionality needed to implement early stopping."""
 
-    def __init__(self, maxChecksWithoutProgress=20):
+    def __init__(self, maxChecksWithoutProgress: int=20):
         self.MAX_CHECKS_WITHOUT_PROGRESS = maxChecksWithoutProgress
 
         self.bestLossVal = np.infty
         self.checksSinceLastProgress = 0
         self.bestModelParams = None
 
-    def getModelParams(self):
+    def getModelParams(self) -> Dict[str, Any]:
         """Returns a dictionary of tf.GraphKeys.GLOBAL_VARIABLES"""
         gvars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
         return {gvar.op.name: value
                 for gvar, value in zip(gvars, tf.get_default_session().run(gvars))}
 
-    def restoreBestModelParams(self):
+    def restoreBestModelParams(self) -> bool:
         """If we have the best model parameters saved, this will restore them."""
         success = False
 
@@ -44,7 +45,7 @@ class EarlyStoppingHelper:
 
         return success
 
-    def shouldStop(self, lossVal):
+    def shouldStop(self, lossVal: float) -> bool:
         """Returns True if you should stop. Check this at the end of each epoch."""
 
         if lossVal < self.bestLossVal:
@@ -62,7 +63,7 @@ class ProgressCalculator:
     then the time to complete the remaining iterations is calculated.
     """
 
-    def __init__(self, targetIterations):
+    def __init__(self, targetIterations: float):
         if targetIterations < 1:
             raise ValueError("targetIterations must larger than zero")
 
@@ -71,18 +72,18 @@ class ProgressCalculator:
         self._completedIterations = 0
         self._startEpochTime = 0
 
-    def start(self):
+    def start(self) -> None:
         """Records the current time as the time when the first iteration started."""
         self._startEpochTime = time.time()
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset the timer and all internal counters"""
         self._itersPerSecond = 0
         self._completedIterations = 0
         self._targetIterations = 0
         self._startEpochTime = 0
 
-    def updateInterval(self, newlyCompletedIterations):
+    def updateInterval(self, newlyCompletedIterations: float) -> None:
         """
         Increment the completed iterations by the provided amount and recalculate the time per
         iteration.
@@ -95,7 +96,7 @@ class ProgressCalculator:
         timeSinceStart = time.time() - self._startEpochTime
         self._itersPerSecond = self._completedIterations / timeSinceStart
 
-    def getSecondsRemaining(self):
+    def getSecondsRemaining(self) -> float:
         """Predict the number of seconds to complete the remaining iterations"""
         if self._completedIterations is 0:
             raise RuntimeError(
@@ -104,16 +105,16 @@ class ProgressCalculator:
         try:
             return (self._targetIterations - self._completedIterations) / self._itersPerSecond
         except ZeroDivisionError:
-            return 0
+            return 0.0
 
-    def getTimeStampRemaining(self):
+    def getTimeStampRemaining(self) -> str:
         """
         Predict the time to complete the remaining iterations and return a formatted timestamp.
         """
         timestamp = datetime.timedelta(seconds=self.getSecondsRemaining())
         return str(timestamp)
 
-    def timeTaken(self):
+    def timeTaken(self) -> str:
         """Returns a formatted timestamp of the total time since start was called."""
         if self._startEpochTime is 0:
             raise RuntimeError("start must be called before attempting to evaluate the time taken")
