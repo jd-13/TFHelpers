@@ -5,6 +5,7 @@ stopping.
 import datetime
 import time
 from typing import Any, Dict
+import warnings
 
 import numpy as np
 
@@ -122,3 +123,60 @@ class ProgressCalculator:
         timeSinceStart = time.time() - self._startEpochTime
         timestamp = datetime.timedelta(seconds=timeSinceStart)
         return str(timestamp)
+
+class TrainingValidator:
+    """
+    Performs simple checks on the model during training to ensure that the model is training
+    correctly.
+    """
+    def __init__(self, graph, session):
+        self._graph = graph
+        self._session = session
+        self._previousTrainables = None
+    
+    def validate(self, loss: float) -> None:
+        """
+        Call this once in each epoch, though you may wish to only do this for the first few epochs.
+        Warnings are raised for each check that fails.
+        """
+        self._checkVariablesTrained()
+        self._checkLoss(loss)
+        self._checkStdDeviation()
+
+    def _checkVariablesTrained(self) -> None:
+        """
+        Compares the values of all TRAINABLE_VARIABLES in this epoch to the previous epoch. Raises
+        a warning if they are the same.
+        """
+        variableNames = self._graph.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+        currentTrainables = self._session.run(variableNames)
+
+        if self._previousTrainables is not None:
+            for previousVariable, currentVariable, name in zip(self._previousTrainables, currentTrainables, variableNames):
+                if (previousVariable == currentVariable).any():
+                    warnings.warn("The following variable might not have been trained: {0}".format(name),
+                                  RuntimeWarning)
+
+        self._previousTrainables = currentTrainables
+
+    def _checkLoss(self, loss: float) -> None:
+        """
+        Checks that the loss is a valid value.
+        """
+        if loss == 0:
+            warnings.warn("Loss is currently zero, this is likely to be an error",
+                          RuntimeWarning)
+    
+    def _checkStdDeviation(self) -> None:
+        """
+        Most trainable variables should have a standard deviation below 2. Anything above this may
+        indicate an exploding gradient.
+        """
+        variableNames = self._graph.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+        trainables = self._session.run(variableNames)
+
+        for name, variable in zip(variableNames, trainables):
+            stdDev = variable.std() 
+            if stdDev > 2:
+                warnings.warn("Variable {0} has a standard deviation of {1}. This may indicate a vanishing/exploding gradient".format(name, stdDev),
+                              RuntimeWarning)

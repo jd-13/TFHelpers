@@ -5,9 +5,11 @@ Tests for functionality in the TrainingHelpers module.
 import time
 import pytest
 
+from sklearn.datasets import make_regression
+
 import tensorflow as tf
 
-from TFHelpers.TrainingHelpers import ProgressCalculator, EarlyStoppingHelper
+from TFHelpers.TrainingHelpers import ProgressCalculator, EarlyStoppingHelper, TrainingValidator
 
 class Test_ProgressCalculator_InvalidBehaviour:
     """
@@ -256,3 +258,72 @@ class Test_EarlyStoppingHelper:
             stoppingHelper.restoreBestModelParams()
             assert A.eval() == 5
             assert B.eval() == 15
+
+class Test_TrainingValidator:
+    """
+    Tests that the TrainingValidator is able to raise the correct warnings.
+    """
+
+    def test_VariablesTrained(self):
+        # Get some data
+        NUM_FEATURES = 10
+        X, y = make_regression(1000, NUM_FEATURES, random_state=42)
+
+        # Setup a basic graph
+        X_in = tf.placeholder(shape=(None, NUM_FEATURES), dtype=tf.float32)
+        y_in = tf.placeholder(shape=(None), dtype=tf.float32)
+        
+        layer1 = tf.layers.dense(X_in, units=NUM_FEATURES)
+
+        # Don't connect the next layer, this is what will cause the warning
+        layer2 = tf.layers.dense(X_in, units=NUM_FEATURES)
+        layer3 = tf.layers.dense(layer1, units=1)
+
+        mse = tf.reduce_mean(tf.square(layer3 - y_in), name="mse")
+        trainingOp = tf.train.AdamOptimizer(learning_rate=0.01).minimize(mse)
+
+        init = tf.global_variables_initializer()
+
+        with tf.Session() as sess:
+            init.run()
+            trainingValidator = TrainingValidator(tf.get_default_graph(), sess)
+
+            feedDict = {X_in: X, y_in: y}
+
+            # Manually run the first epoch
+            sess.run(trainingOp, feed_dict=feedDict)
+            trainingValidator.validate(sess.run(mse, feed_dict=feedDict))
+
+            # Run the second epoch. This should raise a warning
+            sess.run(trainingOp, feed_dict=feedDict)
+            with pytest.warns(RuntimeWarning):
+                trainingValidator.validate(sess.run(mse, feed_dict=feedDict))
+
+    def test_ZeroLoss(self):
+        """
+        Build a basic graph and then provide a loss of 0 to the validator, which should raise a
+        warning.
+        """
+        # Setup a basic graph
+        NUM_FEATURES = 10
+        X_in = tf.placeholder(shape=(None, NUM_FEATURES), dtype=tf.float32)
+        y_in = tf.placeholder(shape=(None), dtype=tf.float32)
+        
+        layer1 = tf.layers.dense(X_in, units=NUM_FEATURES)
+        
+        mse = tf.reduce_mean(tf.square(layer1 - y_in), name="mse")
+        trainingOp = tf.train.AdamOptimizer(learning_rate=0.01).minimize(mse)
+
+        init = tf.global_variables_initializer()
+
+        # Create a session and set the loss to 0 in the validator
+        with tf.Session() as sess:
+            init.run()
+            trainingValidator = TrainingValidator(tf.get_default_graph(), sess)
+
+            with pytest.warns(RuntimeWarning):
+                trainingValidator.validate(0)
+
+    def test_StdDeviation(self):
+        # TODO: not yet sure how to test this effectively
+        pass

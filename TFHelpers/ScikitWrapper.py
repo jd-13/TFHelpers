@@ -8,7 +8,7 @@ from sklearn.exceptions import NotFittedError
 import tensorflow as tf
 
 from TFHelpers.FilesAndLogging import CheckpointAndRestoreHelper, FileManager, TensorboardLogHelper
-from TFHelpers.TrainingHelpers import EarlyStoppingHelper, ProgressCalculator
+from TFHelpers.TrainingHelpers import EarlyStoppingHelper, ProgressCalculator, TrainingValidator
 
 class SKTFWrapper(BaseEstimator, RegressorMixin):
     """
@@ -109,8 +109,6 @@ class TFRegressor(SKTFWrapper):
 
         self._tensors = None
 
-        self._previousTrainables = None
-
     def _buildGraph(self, numFeatures):
         """
         Build the graph and set the _tensors member to a RegressorTensors object which contains the
@@ -149,6 +147,8 @@ class TFRegressor(SKTFWrapper):
                                                    self._tensors.saver)
 
         self._session = tf.Session(graph=self._graph)
+
+        trainingValidator = TrainingValidator(self._graph, self._session)
         with self._session.as_default() as sess:
             if self._allowRestore:
                 startEpoch = restoreHelper.restoreIfCheckpoint(sess)
@@ -187,17 +187,8 @@ class TFRegressor(SKTFWrapper):
 
                 restoreHelper.saveCheckpoint(sess, epoch)
 
-                # Check if all variables are being trained
                 if epoch < 2:
-                    variableNames = self._graph.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
-                    currentTrainables = sess.run(variableNames)
-
-                    if self._previousTrainables is not None:
-                        for previousVariable, currentVariable, name in zip(self._previousTrainables, currentTrainables, variableNames):
-                            if (previousVariable == currentVariable).any():
-                                print("Not all variables have been trained: {0}".format(name))
-
-                    self._previousTrainables = currentTrainables
+                    trainingValidator.validate(lossVal)
 
                 # This must be the last thing done in an epoch
                 if stoppingHelper.shouldStop(lossVal):
