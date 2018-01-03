@@ -96,6 +96,7 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#sktfmodels">SKTFModels</a></li>
+            <li><a href="#basicregressor">BasicRegressor</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
@@ -103,8 +104,30 @@
 <h1 id="sktfmodels">SKTFModels</h1>
 <p>This module provides examples of models built using the <code>SciKitWrapper</code> module. This is a good place
 to start if you wish to implement your own models using this wrapper.</p>
+<h2 id="basicregressor">BasicRegressor</h2>
 <p>Currently this module provides only the <code>BasicRegressor</code> class, which inherits from <code>TFRegressor</code>
-and implements a basic multilayer feedforward network for regressions.</p></div>
+and implements a basic multilayer feedforward network for regressions. Its hyperparameters are to be
+passed to the constructor as follows, and provide the following options:</p>
+<pre><code>BasicRegressor(self,
+               learningRate=0.01,
+               batchSize=1000,
+               initializer=,
+               dropoutRate=0.01,
+               restoreFrom=None,
+               hiddenNeuronsList=[10])
+</code></pre>
+<ul>
+<li><code>learningRate</code>: Provided to the gradient descent algorithm, in this case <code>tf.train.AdamOptimizer</code></li>
+<li><code>batchSize</code>: Number of rows of data to operate on at once</li>
+<li><code>initializer</code>: The initializer to use as the kernel initializer for each layer</li>
+<li><code>dropoutRate</code>: Not yet implemented in this model, does nothing</li>
+<li><code>restoreFrom</code>: If this model has been trained previously with the same hyperparameters, provide
+the date time string of the form YYYYMMDD-HHmm which corresponds to the previous training run. The
+<code>CheckpointAndRestoreHelper</code> will then look this up from the models directory.</li>
+<li><code>hiddenNeuronsList</code>: A list of integers which describes the number of neurons in each hidden layer.
+Eg. [100, 50, 30] would mean 100 neurons in the first layer, 50 in the second and 30 in the third
+layer.</li>
+</ul></div>
         </div>
 
         <footer class="col-md-12">

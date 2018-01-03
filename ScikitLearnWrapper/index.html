@@ -107,26 +107,35 @@ compatible with the scikit-learn api. Models which inherit from the <code>SKTFWr
 compatible scikit-learn functionality such as <code>GridSearchCV</code>, and will provide <code>fit</code> and <code>predict</code>
 methods for training and producing predictions.</p>
 <p>If you inherit from <code>SKTFWrapper</code> you will need to build the graph and implement the the training
-loop in the <code>fit</code> method. The <code>SciKitWrapper</code> module will also contain child classes of
+loop in the <code>fit</code> method. The <code>SciKitWrapper</code> module also contains child classes of
 <code>SKTFWrapper</code> which provide further functionality. Currently only <code>TFRegressor</code> is available.</p>
-<h3 id="tfregressor">TFRegressor</h3>
+<h2 id="tfregressor">TFRegressor</h2>
 <p>If you wish to create a regression model you can inherit for the <code>TFRegressor</code> class which provides
 a lot of functionality, leaving the methods <code>_buildGraph</code> and <code>_buildModelName</code> for you to
 implement.</p>
-<p><code>TFRegressor</code> gives you the following features for free:
-<em> A fairly conventional training loop, with user specified batch size
-</em> Logging of training and validation losses to tensorboard on each epoch, as well as writing any <code>tf.Summary</code> nodes at each epoch
-<em> Saving the model at each epoch
-</em> Continuing training from previous runs
-<em> Saving all model and tensorboard related files in separate directories, sorted by model hyperparameters and start time
-</em> Early stopping
-<em> Predicted time to completion
-</em> Warnings if parts of the graph do not appear to be training</p>
-<p>In the <code>_buildGraph</code> method you will need to build the graph for your model, and set the <code>_tensors</code>
-data member.</p>
-<p>In the <code>_buildModelName</code> method you will need to return a string which adequately
-describes your model and its hyperparameters. This string is used to group model files.</p>
-<p>See <code>BasicRegressor</code> for an example.</p></div>
+<p><code>TFRegressor</code> gives you the following features for free:</p>
+<ul>
+<li>A fairly conventional training loop, with user specified batch size</li>
+<li>Logging of training and validation losses to tensorboard on each epoch, as well as writing any <code>tf.Summary</code> nodes at each epoch</li>
+<li>Saving the model at each epoch</li>
+<li>Continuing training from previous runs</li>
+<li>Saving all model and tensorboard related files in separate directories, sorted by model hyperparameters and start time</li>
+<li>Early stopping</li>
+<li>Predicted time to completion</li>
+<li>Warnings if parts of the graph do not appear to be training</li>
+</ul>
+<h3 id="implementation">Implementation</h3>
+<pre><code>_buildGraph()
+</code></pre>
+<p>In this method you will need to build the graph for your model, and set the <code>self._tensors</code>
+data member to a <code>TFRegressorTensors</code> object which contains the appropriate operations from your
+graph. This object is the interface between the graph which you have created in <code>_buildGraph</code> and
+the training loop implemented in <code>TFRegressor</code>.</p>
+<pre><code>_buildModelName()
+</code></pre>
+<p>In this method you will need to return a string which adequately describes your model and its
+hyperparameters. This string is used to group model files.</p>
+<p>For complete examples of both of the above methods, see <code>SKTFModels.BasicRegressor</code> for an example.</p></div>
         </div>
 
         <footer class="col-md-12">
