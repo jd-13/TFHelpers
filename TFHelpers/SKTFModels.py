@@ -13,7 +13,7 @@ class BasicRegressor(TFRegressor):
     def __init__(self,
                  learningRate=0.01,
                  batchSize=1000,
-                 initializer=,
+                 initializer=tf.contrib.layers.variance_scaling_initializer(),
                  dropoutRate=0.01,
                  restoreFrom=None,
                  hiddenNeuronsList=[10]):

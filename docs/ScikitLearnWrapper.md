@@ -10,7 +10,7 @@ loop in the `fit` method. The `SciKitWrapper` module also contains child classes
 `SKTFWrapper` which provide further functionality. Currently only `TFRegressor` is available.
 
 ## TFRegressor
-If you wish to create a regression model you can inherit for the `TFRegressor` class which provides
+If you wish to create a regression model you can inherit from the `TFRegressor` class which provides
 a lot of functionality, leaving the methods `_buildGraph` and `_buildModelName` for you to
 implement.
 
@@ -36,4 +36,4 @@ the training loop implemented in `TFRegressor`.
 In this method you will need to return a string which adequately describes your model and its
 hyperparameters. This string is used to group model files.
 
-For complete examples of both of the above methods, see `SKTFModels.BasicRegressor` for an example.
+For complete examples of both of the above methods, see `SKTFModels.BasicRegressor`.
