@@ -7,3 +7,5 @@ pages:
     - Scikit-learn Wrapper: ScikitLearnWrapper.md
     - TrainingHelpers: TrainingHelpers.md
     - FilesAndLogging: FilesAndLogging.md
+
+theme: readthedocs
