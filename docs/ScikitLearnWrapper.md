@@ -6,15 +6,16 @@ compatible scikit-learn functionality such as `GridSearchCV`, and will provide `
 methods for training and producing predictions.
 
 If you inherit from `SKTFWrapper` you will need to build the graph and implement the the training
-loop in the `fit` method. The `SciKitWrapper` module will also contain child classes of
+loop in the `fit` method. The `SciKitWrapper` module also contains child classes of
 `SKTFWrapper` which provide further functionality. Currently only `TFRegressor` is available.
 
-### TFRegressor
+## TFRegressor
 If you wish to create a regression model you can inherit for the `TFRegressor` class which provides
 a lot of functionality, leaving the methods `_buildGraph` and `_buildModelName` for you to
 implement.
 
 `TFRegressor` gives you the following features for free:
+
 * A fairly conventional training loop, with user specified batch size
 * Logging of training and validation losses to tensorboard on each epoch, as well as writing any `tf.Summary` nodes at each epoch
 * Saving the model at each epoch
@@ -24,10 +25,15 @@ implement.
 * Predicted time to completion
 * Warnings if parts of the graph do not appear to be training
 
-In the `_buildGraph` method you will need to build the graph for your model, and set the `_tensors`
-data member.
+### Implementation
+    _buildGraph()
+In this method you will need to build the graph for your model, and set the `self._tensors`
+data member to a `TFRegressorTensors` object which contains the appropriate operations from your
+graph. This object is the interface between the graph which you have created in `_buildGraph` and
+the training loop implemented in `TFRegressor`.
 
-In the `_buildModelName` method you will need to return a string which adequately
-describes your model and its hyperparameters. This string is used to group model files.
+    _buildModelName()
+In this method you will need to return a string which adequately describes your model and its
+hyperparameters. This string is used to group model files.
 
-See `BasicRegressor` for an example.
+For complete examples of both of the above methods, see `SKTFModels.BasicRegressor` for an example.
