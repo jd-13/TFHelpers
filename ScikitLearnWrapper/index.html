@@ -132,7 +132,7 @@ methods for training and producing predictions.</p>
 loop in the <code>fit</code> method. The <code>SciKitWrapper</code> module also contains child classes of
 <code>SKTFWrapper</code> which provide further functionality. Currently only <code>TFRegressor</code> is available.</p>
 <h2 id="tfregressor">TFRegressor</h2>
-<p>If you wish to create a regression model you can inherit for the <code>TFRegressor</code> class which provides
+<p>If you wish to create a regression model you can inherit from the <code>TFRegressor</code> class which provides
 a lot of functionality, leaving the methods <code>_buildGraph</code> and <code>_buildModelName</code> for you to
 implement.</p>
 <p><code>TFRegressor</code> gives you the following features for free:</p>
@@ -157,7 +157,7 @@ the training loop implemented in <code>TFRegressor</code>.</p>
 </code></pre>
 <p>In this method you will need to return a string which adequately describes your model and its
 hyperparameters. This string is used to group model files.</p>
-<p>For complete examples of both of the above methods, see <code>SKTFModels.BasicRegressor</code> for an example.</p>
+<p>For complete examples of both of the above methods, see <code>SKTFModels.BasicRegressor</code>.</p>
               
             </div>
           </div>
