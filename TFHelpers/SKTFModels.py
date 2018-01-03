@@ -11,12 +11,12 @@ class BasicRegressor(TFRegressor):
     Simple regression model for testing TFRegressor.
     """
     def __init__(self,
-                 learningRate,
-                 batchSize,
-                 initializer,
-                 dropoutRate,
-                 restoreFrom,
-                 hiddenNeuronsList):
+                 learningRate=0.01,
+                 batchSize=1000,
+                 initializer=,
+                 dropoutRate=0.01,
+                 restoreFrom=None,
+                 hiddenNeuronsList=[10]):
 
         self.hiddenNeuronsList = hiddenNeuronsList
 
