@@ -80,5 +80,5 @@ class BasicRegressor(TFRegressor):
     def _buildModelName(self):
         return self.__class__.__name__ + "-H-" + "_".join(str(value)
                                                           for value in self.hiddenNeuronsList) \
-                                       + "-I-" + self._mapInitializerName() \
+                                       + "-I-" + self._mapInitializerName(self.initializer) \
                                        + "-D-" + str(self.dropoutRate)

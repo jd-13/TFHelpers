@@ -41,13 +41,13 @@ class SKTFWrapper(BaseEstimator, RegressorMixin):
         if self._session:
             self._session.close()
 
-    def _mapInitializerName(self):
+    def _mapInitializerName(self, initializer):
         """Maps initializer types to a short string suitable for the model's file name"""
 
         initString = "None"
-        if "variance_scaling_initializer" in str(self.initializer):
+        if "variance_scaling_initializer" in str(initializer):
             initString = "he"
-        elif "xavier_initializer" in str(self.initializer):
+        elif "xavier_initializer" in str(initializer):
             initString = "xa"
 
         return initString
@@ -129,7 +129,7 @@ class TFRegressor(SKTFWrapper):
     def fit(self, X, y, X_valid, y_valid, numEpochs=1):
         """Fits the model on the training set"""
         self._closeSession()
-        
+
         # This must be initialised during fit for sklearn's grid search to call it at the correct
         # time
         self._fileManager = FileManager(self._buildModelName(), self.restoreFrom)
