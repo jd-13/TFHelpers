@@ -126,37 +126,59 @@
                 <h1 id="scikit-learn-wrapper">Scikit-learn Wrapper</h1>
 <p>TFHelpers provides a basic wrapper class which you can inherit from to create models which are
 compatible with the scikit-learn api. Models which inherit from the <code>SKTFWrapper</code> class will be
-compatible scikit-learn functionality such as <code>GridSearchCV</code>, and will provide <code>fit</code> and <code>predict</code>
-methods for training and producing predictions.</p>
-<p>If you inherit from <code>SKTFWrapper</code> you will need to build the graph and implement the the training
-loop in the <code>fit</code> method. The <code>SciKitWrapper</code> module also contains child classes of
-<code>SKTFWrapper</code> which provide further functionality. Currently only <code>TFRegressor</code> is available.</p>
+compatible with scikit-learn functionality such as <code>GridSearchCV</code>, and will provide <code>fit</code> and
+<code>predict</code> methods for training and producing predictions.</p>
+<p>If you inherit from <code>SKTFWrapper</code> you will need to build the graph and implement the training loop
+in the <code>fit</code> method. The <code>SciKitWrapper</code> module also contains child classes of <code>SKTFWrapper</code> which
+provide further functionality. Currently only <code>TFRegressor</code> is available.</p>
 <h2 id="tfregressor">TFRegressor</h2>
 <p>If you wish to create a regression model you can inherit from the <code>TFRegressor</code> class which provides
 a lot of functionality, leaving the methods <code>_buildGraph</code> and <code>_buildModelName</code> for you to
 implement.</p>
-<p><code>TFRegressor</code> gives you the following features for free:</p>
+<p>Using <code>TFRegressor</code> gets you the following features for free:</p>
 <ul>
 <li>A fairly conventional training loop, with user specified batch size</li>
 <li>Logging of training and validation losses to tensorboard on each epoch, as well as writing any <code>tf.Summary</code> nodes at each epoch</li>
 <li>Saving the model at each epoch</li>
 <li>Continuing training from previous runs</li>
-<li>Saving all model and tensorboard related files in separate directories, sorted by model hyperparameters and start time</li>
+<li>Saving all model and tensorboard related files in a directory structure sorted by model hyperparameters and start time</li>
 <li>Early stopping</li>
 <li>Predicted time to completion</li>
-<li>Warnings if parts of the graph do not appear to be training</li>
+<li>Warnings if issues are detected during training such as: parts of the graph do not appear to be training, the loss is zero, or there is a risk of exploding gradients</li>
 </ul>
 <h3 id="implementation">Implementation</h3>
-<pre><code>_buildGraph()
-</code></pre>
-<p>In this method you will need to build the graph for your model, and set the <code>self._tensors</code>
-data member to a <code>TFRegressorTensors</code> object which contains the appropriate operations from your
-graph. This object is the interface between the graph which you have created in <code>_buildGraph</code> and
-the training loop implemented in <code>TFRegressor</code>.</p>
 <pre><code>_buildModelName()
 </code></pre>
 <p>In this method you will need to return a string which adequately describes your model and its
 hyperparameters. This string is used to group model files.</p>
+<pre><code>_buildGraph()
+</code></pre>
+<p>In this method you will need to build the graph for your model, and return a <code>RegressorTensors</code>
+object which contains the appropriate operations from your graph. This object is the interface
+between the graph which you have created in <code>_buildGraph</code> and the training loop implemented in
+<code>TFRegressor</code>.</p>
+<pre><code>RegressorTensors(self,
+                 X_in,
+                 y_in,
+                 logits,
+                 loss,
+                 trainingOp,
+                 init,
+                 saver,
+                 dropoutKeepProb)
+</code></pre>
+<p>The constructor of the <code>RegressorTensors</code> object takes several operations from your graph that the
+training loop will use while training the model. Each is explained below:</p>
+<ul>
+<li><code>X_in</code>: The <code>tf.Placeholder</code> for your features</li>
+<li><code>y_in</code>: The <code>tf.Placeholder</code> for your labels</li>
+<li><code>logits</code>: The output of your graph. The predict method will call <code>logits.eval(...)</code> to produce predictions</li>
+<li><code>loss</code>: The loss of your graph. <code>loss.eval(...)</code> will be called to create training and validation loss values to log in tensorboard</li>
+<li><code>trainingOp</code>: The operator that should be evaluated for each batch and epoch to train your model</li>
+<li><code>init</code>: The <code>tf.global_variables_initializer()</code> that should be used to initialise your graph</li>
+<li><code>saver</code>: The <code>tf.train.Saver()</code> that should be used to save the model</li>
+<li><code>dropoutKeepProb</code>: A <code>tf.Placeholder</code> which will be set to the dropout rate during training</li>
+</ul>
 <p>For complete examples of both of the above methods, see <code>SKTFModels.BasicRegressor</code>.</p>
               
             </div>
