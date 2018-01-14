@@ -9,6 +9,9 @@ const main = function() {
 
     // Activate the first button and preview when a file is selected
     $("#modelDirInput").change(function(event) {
+        const $filtersRow = $("#filtersRow");
+        $filtersRow.empty();
+        $filtersRow.append("<h3>Filter by:</h3>");
 
         // Load the directory
         modelFiles = Array.from(event.currentTarget.files);
@@ -66,14 +69,14 @@ const main = function() {
             });
 
             $columnHtml.append($columnFieldSet);
-            $("#filtersRow").append($columnHtml);
+            $filtersRow.append($columnHtml);
         });
 
         // Now show the models that match the selected criteria
         $(".filterCheckbox").change(function(event) {
             const $selectedModelsRow = $("#selectedModelsRow");
             $selectedModelsRow.empty();
-            $selectedModelsRow.append("<h4>Matching models:</h4>");
+            $selectedModelsRow.append("<h3>Matching models:</h3>");
 
             // For each column, get the values that are selected
             let selectedValues = [];
@@ -110,7 +113,7 @@ const main = function() {
             // Build the tensorboard command
             const $tensorboardRow = $("#tensorboardCommandRow");
             $tensorboardRow.empty();
-            $tensorboardRow.append("<h4>Tensorboard command:</h4>");
+            $tensorboardRow.append("<h3>Tensorboard command:</h3>");
 
             let logdirString = "";
             matchingModels.forEach(model => {
