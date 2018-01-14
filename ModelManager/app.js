@@ -73,6 +73,7 @@ const main = function() {
         $(".filterCheckbox").change(function(event) {
             const $selectedModelsRow = $("#selectedModelsRow");
             $selectedModelsRow.empty();
+            $selectedModelsRow.append("<h4>Matching models:</h4>");
 
             // For each column, get the values that are selected
             let selectedValues = [];
@@ -86,6 +87,7 @@ const main = function() {
                 selectedValues[columnName] = values;
             });
 
+            // TODO: put models with mulitple runs on only one row
             // For each model, check if it matches the selected values
             let matchingModels = [];
             models.forEach(model => {
@@ -102,7 +104,21 @@ const main = function() {
                     matchingModels.push(model);
                     $selectedModelsRow.append(`<small>${model["title"]}&emsp;&emsp;${model["timestamp"]}</small><br>`);
                 }
+            });            
+
+            // TODO: remove duplicate logdirs
+            // Build the tensorboard command
+            const $tensorboardRow = $("#tensorboardCommandRow");
+            $tensorboardRow.empty();
+            $tensorboardRow.append("<h4>Tensorboard command:</h4>");
+
+            let logdirString = "";
+            matchingModels.forEach(model => {
+                logdirString += "models/" + model["title"] + ",";
             });
+            logdirString = logdirString.slice(0, -1);
+    
+            $tensorboardRow.append(`<small>tensorboard --logdir=${logdirString}</small>`);
         });
     });
 }
