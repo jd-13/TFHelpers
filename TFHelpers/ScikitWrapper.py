@@ -111,8 +111,8 @@ class TFRegressor(SKTFWrapper):
 
     def _buildGraph(self, numFeatures):
         """
-        Build the graph and set the _tensors member to a RegressorTensors object which contains the
-        important tensors for the graph
+        Build the graph and return a RegressorTensors object which contains the important tensors
+        for the graph.
 
         ** Derived classes should implement this **
         """
@@ -135,7 +135,7 @@ class TFRegressor(SKTFWrapper):
         self._fileManager = FileManager(self._buildModelName(), self.restoreFrom)
 
         with self._graph.as_default():
-            self._buildGraph(X.shape[1])
+            self._tensors = self._buildGraph(X.shape[1])
 
             tensorboardHelper = TensorboardLogHelper(self._fileManager.getModelDir(),
                                                      tf.get_default_graph(),

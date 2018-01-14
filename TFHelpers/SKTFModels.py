@@ -68,14 +68,14 @@ class BasicRegressor(TFRegressor):
             init = tf.global_variables_initializer()
             saver = tf.train.Saver()
 
-        self._tensors = RegressorTensors(X_in,
-                                         y_in,
-                                         logits,
-                                         mse,
-                                         trainingOp,
-                                         init,
-                                         saver,
-                                         dropoutKeepProb)
+        return RegressorTensors(X_in,
+                                y_in,
+                                logits,
+                                mse,
+                                trainingOp,
+                                init,
+                                saver,
+                                dropoutKeepProb)
 
     def _buildModelName(self):
         return self.__class__.__name__ + "-H-" + "_".join(str(value)
