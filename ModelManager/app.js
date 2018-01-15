@@ -62,6 +62,29 @@ function buildTensorboardCommand(matchingModels) {
     $tensorboardRow.append(`<small>tensorboard --logdir=${logdirString}</small>`);
 }
 
+function getMatchingModels(models, selectedValues, $selectedModelsRow) {
+    // TODO: put models with mulitple runs on only one row
+    // For each model, check if it matches the selected values
+    let matchingModels = [];
+    models.forEach(model => {
+
+        let matches = true;
+        Object.keys(selectedValues).forEach(columnName => {
+
+            if (selectedValues[columnName].indexOf(model[columnName]) < 0) {
+                matches = false;
+            }
+        });
+
+        if (matches) {
+            matchingModels.push(model);
+            $selectedModelsRow.append(`<small>${model["title"]}&emsp;&emsp;${model["timestamp"]}</small><br>`);
+        }
+    });
+
+    return matchingModels;
+}
+
 const main = function() {
 
     let modelFiles;
@@ -114,24 +137,7 @@ const main = function() {
                 selectedValues[columnName] = values;
             });
 
-            // TODO: put models with mulitple runs on only one row
-            // For each model, check if it matches the selected values
-            let matchingModels = [];
-            models.forEach(model => {
-
-                let matches = true;
-                Object.keys(selectedValues).forEach(columnName => {
-
-                    if (selectedValues[columnName].indexOf(model[columnName]) < 0) {
-                        matches = false;
-                    }
-                });
-
-                if (matches) {
-                    matchingModels.push(model);
-                    $selectedModelsRow.append(`<small>${model["title"]}&emsp;&emsp;${model["timestamp"]}</small><br>`);
-                }
-            });            
+            const matchingModels = getMatchingModels(models, selectedValues, $selectedModelsRow);         
 
             buildTensorboardCommand(matchingModels);
         });
