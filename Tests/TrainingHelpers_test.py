@@ -184,6 +184,7 @@ class Test_EarlyStoppingHelper:
         stoppingHelper = EarlyStoppingHelper(3)
 
         # Lets add some basic operators to the graph
+        tf.reset_default_graph()
         A = tf.Variable(10, dtype=tf.float32)
         B = tf.Variable(15, dtype=tf.float32)
         init = tf.global_variables_initializer()
@@ -225,6 +226,7 @@ class Test_EarlyStoppingHelper:
         stoppingHelper = EarlyStoppingHelper(3)
 
         # Lets add some basic operators to the graph
+        tf.reset_default_graph()
         A = tf.Variable(10, dtype=tf.float32)
         B = tf.Variable(15, dtype=tf.float32)
         init = tf.global_variables_initializer()
@@ -270,6 +272,7 @@ class Test_TrainingValidator:
         X, y = make_regression(1000, NUM_FEATURES, random_state=42)
 
         # Setup a basic graph
+        tf.reset_default_graph()
         X_in = tf.placeholder(shape=(None, NUM_FEATURES), dtype=tf.float32)
         y_in = tf.placeholder(shape=(None), dtype=tf.float32)
         
@@ -305,6 +308,7 @@ class Test_TrainingValidator:
         warning.
         """
         # Setup a basic graph
+        tf.reset_default_graph()
         NUM_FEATURES = 10
         X_in = tf.placeholder(shape=(None, NUM_FEATURES), dtype=tf.float32)
         y_in = tf.placeholder(shape=(None), dtype=tf.float32)

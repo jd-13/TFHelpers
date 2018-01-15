@@ -33,6 +33,7 @@ class Test_SKTFWrapper:
         """
         Train a TFRegressor model and test the accuracy.
         """
+        tf.reset_default_graph()
         X, y = make_regression(1000, 20, random_state=42)
         X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.8, random_state=42)
         tf.set_random_seed(42)
