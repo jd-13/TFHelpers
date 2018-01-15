@@ -2,6 +2,66 @@ function getModelNameFromFile(file) {
     return file.webkitRelativePath.split("/")[1];
 }
 
+function buildModelDictFromFile(file) {
+    const modelTitle = getModelNameFromFile(file);
+    const modelTimeStamp = file.webkitRelativePath.split("/")[2];
+
+    // Now create a dict that has the properties of this model by parsing the directory
+    // name
+    let modelDict = [];
+    const modelTitleSplit = modelTitle.split("-");
+
+    modelDict["type"] = modelTitleSplit[0];
+    modelDict["timestamp"] = modelTimeStamp;
+    modelDict["title"] = modelTitle;
+
+    for (let iii = 1; iii < modelTitleSplit.length - 2; iii += 2) {
+        modelDict[modelTitleSplit[iii]] = modelTitleSplit[iii + 1];
+    }
+
+    return modelDict;
+}
+
+function buildCheckboxes(modelColumns, models, $filtersRow) {
+    modelColumns.forEach(columnName => {
+        // Get all the possible values for this column
+        let columnValues = new Set();
+        models.forEach(model => {
+            columnValues.add(model[columnName]);
+        });
+
+        // Start building the html element
+        const $columnHtml = $("<div class=\"col-lg-3 col-md-3 col-sm-4 col-xs-12\"></div>");
+        $columnHtml.append($(`<p>${columnName}</p>`));
+        const $columnFieldSet = $(`<fieldset id="${columnName}Checkboxes"></fieldset>`);
+
+        // Add each value to the html element
+        columnValues.forEach(value => {
+            $columnFieldSet.append($(`<input id="${columnName}${value}" value="${value}" type="checkbox" class="filterCheckbox"/>`));
+            $columnFieldSet.append($(`<label for="${columnName}${value}">${value}</label><br>`));
+        });
+
+        $columnHtml.append($columnFieldSet);
+        $filtersRow.append($columnHtml);
+    });
+}
+
+function buildTensorboardCommand(matchingModels) {
+    // TODO: remove duplicate logdirs
+    // Build the tensorboard command
+    const $tensorboardRow = $("#tensorboardCommandRow");
+    $tensorboardRow.empty();
+    $tensorboardRow.append("<h3>Tensorboard command:</h3>");
+
+    let logdirString = "";
+    matchingModels.forEach(model => {
+        logdirString += "models/" + model["title"] + ",";
+    });
+    logdirString = logdirString.slice(0, -1);
+
+    $tensorboardRow.append(`<small>tensorboard --logdir=${logdirString}</small>`);
+}
+
 const main = function() {
 
     let modelFiles;
@@ -22,23 +82,7 @@ const main = function() {
 
         modelFiles.forEach(file => {
             if (file.name == filterFilename) {
-                const modelTitle = getModelNameFromFile(file);
-                const modelTimeStamp = file.webkitRelativePath.split("/")[2];
-
-                // Now create a dict that has the properties of this model by parsing the directory
-                // name
-                let modelDict = [];
-                const modelTitleSplit = modelTitle.split("-");
-
-                modelDict["type"] = modelTitleSplit[0];
-                modelDict["timestamp"] = modelTimeStamp;
-                modelDict["title"] = modelTitle;
-
-                for (let iii = 1; iii < modelTitleSplit.length - 2; iii += 2) {
-                    modelDict[modelTitleSplit[iii]] = modelTitleSplit[iii + 1];
-                }
-
-                models.push(modelDict);
+                models.push(buildModelDictFromFile(file));
             }
         });
 
@@ -50,27 +94,7 @@ const main = function() {
             return element !== "timestamp" && element !== "title";
         });
 
-        modelColumns.forEach(columnName => {
-            // Get all the possible values for this column
-            let columnValues = new Set();
-            models.forEach(model => {
-                columnValues.add(model[columnName]);
-            });
-
-            // Start building the html element
-            const $columnHtml = $("<div class=\"col-lg-3 col-md-3 col-sm-4 col-xs-12\"></div>");
-            $columnHtml.append($(`<p>${columnName}</p>`));
-            const $columnFieldSet = $(`<fieldset id="${columnName}Checkboxes"></fieldset>`);
-
-            // Add each value to the html element
-            columnValues.forEach(value => {
-                $columnFieldSet.append($(`<input id="${columnName}${value}" value="${value}" type="checkbox" class="filterCheckbox"/>`));
-                $columnFieldSet.append($(`<label for="${columnName}${value}">${value}</label><br>`));
-            });
-
-            $columnHtml.append($columnFieldSet);
-            $filtersRow.append($columnHtml);
-        });
+        buildCheckboxes(modelColumns, models, $filtersRow);
 
         // Now show the models that match the selected criteria
         $(".filterCheckbox").change(function(event) {
@@ -109,19 +133,7 @@ const main = function() {
                 }
             });            
 
-            // TODO: remove duplicate logdirs
-            // Build the tensorboard command
-            const $tensorboardRow = $("#tensorboardCommandRow");
-            $tensorboardRow.empty();
-            $tensorboardRow.append("<h3>Tensorboard command:</h3>");
-
-            let logdirString = "";
-            matchingModels.forEach(model => {
-                logdirString += "models/" + model["title"] + ",";
-            });
-            logdirString = logdirString.slice(0, -1);
-    
-            $tensorboardRow.append(`<small>tensorboard --logdir=${logdirString}</small>`);
+            buildTensorboardCommand(matchingModels);
         });
     });
 }
