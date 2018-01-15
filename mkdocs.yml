@@ -7,5 +7,6 @@ pages:
     - Scikit-learn Wrapper: ScikitLearnWrapper.md
     - TrainingHelpers: TrainingHelpers.md
     - FilesAndLogging: FilesAndLogging.md
+  - ModelManager: ModelManager.md
 
 theme: readthedocs

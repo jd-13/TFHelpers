@@ -7,3 +7,7 @@ The modules `FilesAndLogging` and `TrainingHelpers` provide functionality such a
 files and early stopping, and may be useful in many tensorflow models. The module `ScikitWrapper`
 provides several classes which aid with implementing tensorflow models behind a scikit-learn style
 API.
+
+If you use the `FilesAndLogging` module you'll also be able to use the `ModelManager` web interface
+to sort your models by hyperparameters and generate the appropriate tensorboard commands to compare
+different models and training runs.
