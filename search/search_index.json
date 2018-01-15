@@ -2,12 +2,12 @@
     "docs": [
         {
             "location": "/",
-            "text": "TFHelpers\n\n\nTFHelpers is a small collection of classes which implement common tasks in Tensorflow. The\nfunctionality provided by each module is described in this documentation.\n\n\nThe modules \nFilesAndLogging\n and \nTrainingHelpers\n provide functionality such as managing model\nfiles and early stopping, and may be useful in many tensorflow models. The module \nScikitWrapper\n\nprovides several classes which aid with implementing tensorflow models behind a scikit-learn style\nAPI.",
+            "text": "TFHelpers\n\n\nTFHelpers is a small collection of classes which implement common tasks in Tensorflow. The\nfunctionality provided by each module is described in this documentation.\n\n\nThe modules \nFilesAndLogging\n and \nTrainingHelpers\n provide functionality such as managing model\nfiles and early stopping, and may be useful in many tensorflow models. The module \nScikitWrapper\n\nprovides several classes which aid with implementing tensorflow models behind a scikit-learn style\nAPI.\n\n\nIf you use the \nFilesAndLogging\n module you'll also be able to use the \nModelManager\n web interface\nto sort your models by hyperparameters and generate the appropriate tensorboard commands to compare\ndifferent models and training runs.",
             "title": "Home"
         },
         {
             "location": "/#tfhelpers",
-            "text": "TFHelpers is a small collection of classes which implement common tasks in Tensorflow. The\nfunctionality provided by each module is described in this documentation.  The modules  FilesAndLogging  and  TrainingHelpers  provide functionality such as managing model\nfiles and early stopping, and may be useful in many tensorflow models. The module  ScikitWrapper \nprovides several classes which aid with implementing tensorflow models behind a scikit-learn style\nAPI.",
+            "text": "TFHelpers is a small collection of classes which implement common tasks in Tensorflow. The\nfunctionality provided by each module is described in this documentation.  The modules  FilesAndLogging  and  TrainingHelpers  provide functionality such as managing model\nfiles and early stopping, and may be useful in many tensorflow models. The module  ScikitWrapper \nprovides several classes which aid with implementing tensorflow models behind a scikit-learn style\nAPI.  If you use the  FilesAndLogging  module you'll also be able to use the  ModelManager  web interface\nto sort your models by hyperparameters and generate the appropriate tensorboard commands to compare\ndifferent models and training runs.",
             "title": "TFHelpers"
         },
         {
@@ -64,6 +64,16 @@
             "location": "/FilesAndLogging/#filesandlogging",
             "text": "Several classes which assist with managing model files and creating tensorboard logs.",
             "title": "FilesAndLogging"
+        },
+        {
+            "location": "/ModelManager/",
+            "text": "ModelManager\n\n\nThe \nModelManager\n is a browser based interface for viewing models and sorting them by\nhyperparameters. It is very early in development, and currently its main use is generating the\ntensorboard command to view models with a chosen set of hyperparameters.\n\n\nYou can start the \nModelManager\n by opening the \nModelManager/index.html\n file, and selecting your\nmodels directory on main page.",
+            "title": "ModelManager"
+        },
+        {
+            "location": "/ModelManager/#modelmanager",
+            "text": "The  ModelManager  is a browser based interface for viewing models and sorting them by\nhyperparameters. It is very early in development, and currently its main use is generating the\ntensorboard command to view models with a chosen set of hyperparameters.  You can start the  ModelManager  by opening the  ModelManager/index.html  file, and selecting your\nmodels directory on main page.",
+            "title": "ModelManager"
         }
     ]
 }
