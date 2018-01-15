@@ -67,7 +67,7 @@ class Test_CheckpointAndRestoreHelper:
 
         # Check all files are created
         for filename in ["checkpoint", "model.ckpt.data-00000-of-00001", "model.ckpt.epoch", "model.ckpt.index", "model.ckpt.meta"]:
-            assert os.path.isfile(pathlib.Path.cwd() / "models" / MODEL_DIR / START_DATETIME / filename)
+            assert os.path.isfile(str(pathlib.Path.cwd() / "models" / MODEL_DIR / START_DATETIME / filename))
 
     def test_RestoreModel(self):
         """
