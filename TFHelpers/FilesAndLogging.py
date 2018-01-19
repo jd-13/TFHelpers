@@ -11,26 +11,29 @@ import tensorflow as tf
 
 class CheckpointAndRestoreHelper:
     """
-    Provides functionality for saving the model during training (.ckpt) and writing the number of
+    Provides functionality for saving the model during training (*.ckpt.*) and writing the number of
     epochs to a file.
     """
-    def __init__(self, modelRootPath: str, saver):
+    def __init__(self, modelRootPath: str, shouldRestore: bool, graph):
+        self.MODEL_ROOT_DIR = str(pathlib.Path(modelRootPath).parents[0])
         self.MODEL_CKPT_PATH = modelRootPath + ".ckpt"
         self.MODEL_EPOCH_PATH = self.MODEL_CKPT_PATH + ".epoch"
-        self._saver = saver
+        self.MODEL_META_PATH = self.MODEL_CKPT_PATH +".meta"
 
-    def restoreIfCheckpoint(self, sess) -> int:
+        with graph.as_default():
+            if shouldRestore:
+                self._saver = tf.train.import_meta_graph(self.MODEL_META_PATH)
+            else:
+                self._saver = tf.train.Saver()
+
+    def restoreFromCheckpoint(self, sess) -> int:
         """Attempts to restore from a checkpoint if one is available. Returns the epoch number to
         start from"""
-        if os.path.isfile(self.MODEL_EPOCH_PATH):
-            with open(self.MODEL_EPOCH_PATH, "rb") as f:
-                startEpoch = int(f.read())
+        with open(self.MODEL_EPOCH_PATH, "rb") as f:
+            startEpoch = int(f.read())
 
-            print("Found checkpoint file, continuing from epoch:", startEpoch)
-            self._saver.restore(sess, self.MODEL_CKPT_PATH)
-        else:
-            print("No checkpoint found, using new model")
-            startEpoch = 0
+        print("Found checkpoint file, continuing from epoch:", startEpoch)
+        self._saver.restore(sess, tf.train.latest_checkpoint(self.MODEL_ROOT_DIR))
 
         return startEpoch
 
