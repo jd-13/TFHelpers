@@ -2,3 +2,6 @@
 .cache/*
 .coverage
 site/*
+dist/*
+TFHelpers.egg-info/*
+build/*
