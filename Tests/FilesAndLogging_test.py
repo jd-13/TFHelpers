@@ -52,13 +52,14 @@ class Test_CheckpointAndRestoreHelper:
         A = tf.Variable(10, dtype=tf.float32)
         B = tf.Variable(15, dtype=tf.float32)
         init = tf.global_variables_initializer()
-        saver = tf.train.Saver()
         
         # Setup our helpers
         MODEL_DIR = "test_FileCreation"
         START_DATETIME = datetime.utcnow().strftime("%Y%m%d-%H%M")
         fileManager = FileManager(MODEL_DIR, None)
-        restoreHelper = CheckpointAndRestoreHelper(fileManager.getModelDirAndPrefix(), saver)
+        restoreHelper = CheckpointAndRestoreHelper(fileManager.getModelDirAndPrefix(),
+                                                   False,
+                                                   tf.get_default_graph())
 
         # Now we'll save the model (we don't actually need to train anything)
         with tf.Session() as sess:
@@ -79,7 +80,6 @@ class Test_CheckpointAndRestoreHelper:
         A = tf.Variable(10, dtype=tf.float32)
         B = tf.Variable(15, dtype=tf.float32)
         init = tf.global_variables_initializer()
-        saver = tf.train.Saver()
 
         # And some ops so that we can mess with the variables
         A_mod = A.assign(5)
@@ -87,7 +87,9 @@ class Test_CheckpointAndRestoreHelper:
 
         # Setup our helpers
         fileManager = FileManager("test_RestoreModel", None)
-        restoreHelper = CheckpointAndRestoreHelper(fileManager.getModelDirAndPrefix(), saver)
+        restoreHelper = CheckpointAndRestoreHelper(fileManager.getModelDirAndPrefix(),
+                                                   False,
+                                                   tf.get_default_graph())
 
         # Now we'll save the model (we don't actually need to train anything)
         with tf.Session() as sess:
@@ -101,6 +103,6 @@ class Test_CheckpointAndRestoreHelper:
             assert B.eval() == 5
 
             # Now restore the model and check that the variables are restored
-            restoreHelper.restoreIfCheckpoint(sess)
+            restoreHelper.restoreFromCheckpoint(sess)
             assert A.eval() == 10
             assert B.eval() == 15

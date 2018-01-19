@@ -1,3 +1,4 @@
+import sys
 import time
 
 import numpy as np
@@ -63,13 +64,10 @@ class RegressorTensors:
                  logits,
                  loss,
                  trainingOp,
-                 init,
-                 saver,
                  dropoutKeepProb):
         self.X_in, self.y_in = X_in, y_in
         self.logits, self.loss = logits, loss
         self.trainingOp = trainingOp
-        self.init, self.saver = init, saver
         self.dropoutKeepProb = dropoutKeepProb
 
 class TFRegressor(SKTFWrapper):
@@ -108,6 +106,8 @@ class TFRegressor(SKTFWrapper):
         self._allowRestore = restoreFrom is not None
 
         self._tensors = None
+        self._init = None
+        self._saver = None
 
     def _buildGraph(self, numFeatures):
         """
@@ -115,6 +115,15 @@ class TFRegressor(SKTFWrapper):
         for the graph.
 
         ** Derived classes should implement this **
+        """
+        raise NotImplementedError()
+
+    def _restoreGraph(self, graph):
+        """
+        Use graph.get_tensor_by_name("<name>:0") to collect the important tensors and return a
+        RegressorTensors object.
+
+        ** Derived classes should implement this if they intend to support restoration **
         """
         raise NotImplementedError()
 
@@ -135,28 +144,37 @@ class TFRegressor(SKTFWrapper):
         self._fileManager = FileManager(self._buildModelName(), self.restoreFrom)
 
         with self._graph.as_default():
-            self._tensors = self._buildGraph(X.shape[1])
+            if self.restoreFrom is None:
+                self._tensors = self._buildGraph(X.shape[1])
+                self._init = tf.global_variables_initializer()
 
             tensorboardHelper = TensorboardLogHelper(self._fileManager.getModelDir(),
                                                      tf.get_default_graph(),
                                                      ["LossTrain", "LossVal", "BatchTimeAvg"])
 
         stoppingHelper = EarlyStoppingHelper()
-        progressCalc = ProgressCalculator(numEpochs)
         restoreHelper = CheckpointAndRestoreHelper(self._fileManager.getModelDirAndPrefix(),
-                                                   self._tensors.saver)
+                                                   self.restoreFrom is not None,
+                                                   self._graph)
 
         self._session = tf.Session(graph=self._graph)
 
         trainingValidator = TrainingValidator(self._graph, self._session)
         with self._session.as_default() as sess:
-            if self._allowRestore:
-                startEpoch = restoreHelper.restoreIfCheckpoint(sess)
-            else:
+            if self.restoreFrom is None:
                 startEpoch = 0
+                self._init.run()
+            else:
+                startEpoch = restoreHelper.restoreFromCheckpoint(sess)
+                try:
+                    self._tensors = self._restoreGraph(self._graph)
+                except KeyError as err:
+                    print([n.name for n in self._graph.as_graph_def().node])
+                    print("\n" + str(err))
+                    print("\nThe available tensors have been printed above this error")
+                    sys.exit()
 
-            self._tensors.init.run()
-
+            progressCalc = ProgressCalculator(numEpochs - startEpoch)
             progressCalc.start()
             for epoch in range(startEpoch, numEpochs):
                 randomIndicies = np.random.permutation(len(X))
