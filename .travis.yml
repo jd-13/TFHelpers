@@ -11,7 +11,7 @@ env:
 install:
   - docker pull $DOCKER_IMG
 
-before_script: 
+before_script:
 
 script:
   - CODE_COV_ENVS=`bash <(curl -s https://codecov.io/env)`
