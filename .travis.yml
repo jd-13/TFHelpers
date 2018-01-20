@@ -15,6 +15,6 @@ before_script:
 
 script:
   - CODE_COV_ENVS=`bash <(curl -s https://codecov.io/env)`
-  - docker run --mount type=bind,source="$(pwd)",target=/home/travisDir $CODE_COV_ENVS $DOCKER_IMG /bin/bash -c "cd /home/travisDir && pytest --cov=TFHelpers && bash <(curl -s https://codecov.io/bash)"
+  - docker run --mount type=bind,source="$(pwd)",target=/home/travisDir $CODE_COV_ENVS $DOCKER_IMG /bin/bash -c "cd /home/travisDir && pytest --cov=TFHelpers && bash <(curl -s https://codecov.io/bash) && python3.5 setup.py bdist_wheel"
 
 after_success:
