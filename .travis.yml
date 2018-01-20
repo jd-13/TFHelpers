@@ -28,4 +28,3 @@ deploy:
   file: dist/TFHelpers-*.whl
   on:
     repo: jd-13/TFHelpers
-    branch: wheel_build
