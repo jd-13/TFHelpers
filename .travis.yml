@@ -15,6 +15,16 @@ before_script:
 
 script:
   - CODE_COV_ENVS=`bash <(curl -s https://codecov.io/env)`
-  - docker run --mount type=bind,source="$(pwd)",target=/home/travisDir $CODE_COV_ENVS $DOCKER_IMG /bin/bash -c "cd /home/travisDir && pytest --cov=TFHelpers && bash <(curl -s https://codecov.io/bash)"
+  - docker run --mount type=bind,source="$(pwd)",target=/home/travisDir $CODE_COV_ENVS $DOCKER_IMG /bin/bash -c "cd /home/travisDir && pytest --cov=TFHelpers && bash <(curl -s https://codecov.io/bash) && python3.6 setup.py bdist_wheel"
 
-after_success:
+after_success: 
+
+deploy:
+  provider: releases
+  prerelease: true
+  api_key:
+    secure: U55z4V83H31kFEzq8TEaoESpW70qSzKyngr6XpGFThW3MHlby6qmT6Gap+HJaefM3yQ7LBX2H7CUu27btc2KY1EK4R/FQDAuKqrapvM/forXMdLz2Z8rSZ7naH7TksOrW3sgnENXqBVhrklv2rJZ4u7IcBe82c7WkXhqJhf5bZLHf+X94mxmym3a8sa2RVU7KNo+BQdZKPdTZAbkgY9TTGIX5NmvT8E2Hc/Fr0fbXC8kFo+3KVlWHE28BzEitK4sL6IzvCor6c7Xat3IPXWyEWSZt/XaBPgM0iyOoH+PhiRZ3f5s69VKhL+8blo0UC3etjgJF27O/pZ4D0uwBDQPtUxvwBd2Wo/SJ+WB+bgJnbnl+YlAYW8llFdTPgR0D3C3ICDNY83Gc+g+wZ44wNssDxgGyJJ99vGXV8hzm3IygsV2ovutniqze1uLJc6esVuVU/Wx3bvOBzRroqT9sykOFRSnxUiOEuww5PrzhjtYbDnF5M0IQEqgY/SKkRPhwg12Efw12oUyQf7YvznLSMHBmWO9qhsQemQ0LPnmrJy8D9Y0IMMZcouBYQNeBhk1FtTjMgRo0sEAPnwJmQsDTenTMvogi86+OJfAc+N27Ew8MhaaYauhuJZPFMWxVAyBeRrk6dcNMLJzZ9b4BGVZyHJc68cmCyr2t326SyWQePsPdKM=
+  file_glob: true
+  file: dist/TFHelpers-*.whl
+  on:
+    repo: jd-13/TFHelpers
