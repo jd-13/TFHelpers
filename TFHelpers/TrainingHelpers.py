@@ -21,7 +21,7 @@ class EarlyStoppingHelper:
         self.checksSinceLastProgress = 0
         self.bestModelParams = None
 
-    def getModelParams(self) -> Dict[str, Any]:
+    def _getModelParams(self) -> Dict[str, Any]:
         """Returns a dictionary of tf.GraphKeys.GLOBAL_VARIABLES"""
         gvars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
         return {gvar.op.name: value
@@ -52,7 +52,7 @@ class EarlyStoppingHelper:
         if lossVal < self.bestLossVal:
             self.bestLossVal = lossVal
             self.checksSinceLastProgress = 0
-            self.bestModelParams = self.getModelParams()
+            self.bestModelParams = self._getModelParams()
         else:
             self.checksSinceLastProgress += 1
 
