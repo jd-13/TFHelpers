@@ -152,7 +152,45 @@ has been called without lossVal decreasing has exceeded the value <code>maxCheck
 provided in the constructor.</p>
 <h2 id="progresscalculator">ProgressCalculator</h2>
 <p>Records the time taken and estimates the time remaining.</p>
+<pre><code>__init__(self, targetIterations: float)
+</code></pre>
+<p>Construct this object shortly before your training loop, where <code>targetIterations</code> is the number of
+epochs the model is expected to run for.</p>
+<pre><code>start(self) -&gt; None
+</code></pre>
+<p>Starts the timer. Call this immediately before entering the training loop</p>
+<pre><code>reset(self) -&gt; None
+</code></pre>
+<p>Resets the timer and all counters.</p>
+<pre><code>updateInterval(self, newlyCompletedIterations: float) -&gt; None
+</code></pre>
+<p>Given the number of iterations completed since this was last called (<code>newlyCompletedIterations</code>),
+updates the expected time to completion.</p>
+<pre><code>getSecondsRemaining(self) -&gt; float
+getTimeStampRemaining(self) -&gt; str
+</code></pre>
+<p>Returns the time remaining.</p>
+<pre><code>timeTaken(self) -&gt; str
+</code></pre>
+<p>Returns the time taken so far.</p>
 <h2 id="trainingvalidator">TrainingValidator</h2>
+<p>Provides multiple checks which can be performed while the model is training.</p>
+<pre><code>__init__(self, graph, session)
+</code></pre>
+<p>Construct this object shortly before your training loop, where <code>graph</code> and <code>session</code> are the graph
+and session used for your model.</p>
+<pre><code>validate(self, loss: float) -&gt; None
+</code></pre>
+<p>Run this once on each epoch, where <code>loss</code> is the validation loss for the current epoch. You may
+wish to call this for only the first few epochs.</p>
+<p>This performs the following checks, and raises a <code>RuntimeWarning</code> for any checks that fail:</p>
+<ul>
+<li>If any variables in TRAINABLE_VARIABLES haven't changed between epochs, which could indicate parts
+of the graph are not being trained due to a programming error</li>
+<li>If the loss value is exactly zero, which could indicate a programming error</li>
+<li>If the standard deviation within a set of trainable variables becomes too high, which could
+indicate exploding gradients</li>
+</ul>
               
             </div>
           </div>
