@@ -23,5 +23,5 @@ setup(
     ],
     keywords="tensorflow machine-learning",
     packages=["TFHelpers"],
-    install_requires=["tensorflow", "sklearn"],
+    install_requires=["tensorflow", "sklearn", "numpy"],
 )
