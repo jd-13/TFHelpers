@@ -11,6 +11,7 @@ Documentation is available [here](https://jd-13.github.io/TFHelpers/) (though on
 ### Requirements
 * tensorflow
 * scikit-learn
+* numpy
 
 ### Installation
 Built wheel files are uploaded to the releases page, where the latest stable release is marked
