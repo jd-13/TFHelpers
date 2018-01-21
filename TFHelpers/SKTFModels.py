@@ -79,7 +79,7 @@ class BasicRegressor(TFRegressor):
                                 graph.get_tensor_by_name("inputs/y_in:0"),
                                 graph.get_tensor_by_name("dnn/logits:0"),
                                 graph.get_tensor_by_name("loss/mse:0"),
-                                graph.get_tensor_by_name("train/trainingOp:0"),
+                                graph.get_operation_by_name("train/trainingOp"),
                                 graph.get_tensor_by_name("dnn/keep_prob:0"))
 
     def _buildModelName(self):
