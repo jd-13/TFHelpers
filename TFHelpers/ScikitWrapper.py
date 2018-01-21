@@ -171,7 +171,7 @@ class TFRegressor(SKTFWrapper):
                 except KeyError as err:
                     print([n.name for n in self._graph.as_graph_def().node])
                     print("\n" + str(err))
-                    print("\nThe available tensors have been printed above this error")
+                    print("\nThe available tensors/ops have been printed above this error")
                     sys.exit()
 
             progressCalc = ProgressCalculator(numEpochs - startEpoch)
