@@ -55,27 +55,32 @@ class BasicRegressor(TFRegressor):
                 tf.summary.histogram("dense_{0}/bias".format(layer),
                                      tf.get_default_graph().get_tensor_by_name(path + "/bias:0"))
 
-            logits = tf.layers.dense(layerOutput, units=1, kernel_initializer=self.initializer)
+            logits = tf.layers.dense(layerOutput,
+                                     units=1,
+                                     kernel_initializer=self.initializer,
+                                     name="logits")
 
         with tf.name_scope("loss"):
             mse = tf.reduce_mean(tf.square(logits - y_in), name="mse")
 
         with tf.name_scope("train"):
             optimizer = tf.train.AdamOptimizer(learning_rate=self.learningRate)
-            trainingOp = optimizer.minimize(mse)
-
-        with tf.name_scope("init_and_save"):
-            init = tf.global_variables_initializer()
-            saver = tf.train.Saver()
+            trainingOp = optimizer.minimize(mse, name="trainingOp")
 
         return RegressorTensors(X_in,
                                 y_in,
                                 logits,
                                 mse,
                                 trainingOp,
-                                init,
-                                saver,
                                 dropoutKeepProb)
+
+    def _restoreGraph(self, graph):
+        return RegressorTensors(graph.get_tensor_by_name("inputs/X_in:0"),
+                                graph.get_tensor_by_name("inputs/y_in:0"),
+                                graph.get_tensor_by_name("dnn/logits:0"),
+                                graph.get_tensor_by_name("loss/mse:0"),
+                                graph.get_operation_by_name("train/trainingOp"),
+                                graph.get_tensor_by_name("dnn/keep_prob:0"))
 
     def _buildModelName(self):
         return self.__class__.__name__ + "-H-" + "_".join(str(value)
