@@ -71,6 +71,16 @@
             
     <li class="toctree-l3"><a href="#traininghelpers">TrainingHelpers</a></li>
     
+        <ul>
+        
+            <li><a class="toctree-l4" href="#earlystoppinghelper">EarlyStoppingHelper</a></li>
+        
+            <li><a class="toctree-l4" href="#progresscalculator">ProgressCalculator</a></li>
+        
+            <li><a class="toctree-l4" href="#trainingvalidator">TrainingValidator</a></li>
+        
+        </ul>
+    
 
     </ul>
                 </li>
@@ -123,7 +133,26 @@
             <div class="section">
               
                 <h1 id="traininghelpers">TrainingHelpers</h1>
-<p>Classes which provide functionality within the training loop of a tensorflow model.</p>
+<p>Classes which provide functionality within the training loop of a tensorflow model. To see examples
+of how these classes are used, refer to the <code>fit</code> method of <code>TFRegressor</code>.</p>
+<h2 id="earlystoppinghelper">EarlyStoppingHelper</h2>
+<p>Implements early stopping in your model by checking the loss at each epoch.</p>
+<pre><code>__init__(self, maxChecksWithoutProgress: int)
+</code></pre>
+<p>Construct this object shortly before your training loop, where <code>maxChecksWithoutProgress</code> is the
+number of epochs to continue without a declining loss before <code>shouldStop</code> returns <code>False</code>.</p>
+<pre><code>restoreBestModelParams(self) -&gt; bool
+</code></pre>
+<p>Call this after your training loop to restore the model to the state which achived the lowest loss.</p>
+<pre><code>shouldStop(self, lossVal: float) -&gt; bool
+</code></pre>
+<p>Call this every epoch, providing the validation loss in <code>lossVal</code>. If <code>lossVal</code> is lower than any
+previous value then state of the model will be stored. Returns <code>False</code> if the number of times this
+has been called without lossVal decreasing has exceeded the value <code>maxChecksWithoutProgress</code> as
+provided in the constructor.</p>
+<h2 id="progresscalculator">ProgressCalculator</h2>
+<p>Records the time taken and estimates the time remaining.</p>
+<h2 id="trainingvalidator">TrainingValidator</h2>
               
             </div>
           </div>
