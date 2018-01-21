@@ -18,11 +18,11 @@ class CheckpointAndRestoreHelper:
         self.MODEL_ROOT_DIR = str(pathlib.Path(modelRootPath).parents[0])
         self.MODEL_CKPT_PATH = modelRootPath + ".ckpt"
         self.MODEL_EPOCH_PATH = self.MODEL_CKPT_PATH + ".epoch"
-        self.MODEL_META_PATH = self.MODEL_CKPT_PATH +".meta"
+        MODEL_META_PATH = self.MODEL_CKPT_PATH +".meta"
 
         with graph.as_default():
             if shouldRestore:
-                self._saver = tf.train.import_meta_graph(self.MODEL_META_PATH)
+                self._saver = tf.train.import_meta_graph(MODEL_META_PATH)
             else:
                 self._saver = tf.train.Saver()
 
