@@ -102,7 +102,7 @@ class TensorboardLogHelper:
                 # If we are restoring from a previous run, get the existing placeholders and summary
                 # else add new placeholders and summaries to the graph
                 if shouldRestore:
-                    self._summaryPlaceholders = [tf.get_default_graph().get_tensor_by_name(THIS_NAMESCOPE+ "/" + name + ":0")
+                    self._summaryPlaceholders = [tf.get_default_graph().get_tensor_by_name(THIS_NAMESCOPE + "/" + name + ":0")
                                                 for name in summaryNames]
                     self._summaries = tf.get_default_graph().get_tensor_by_name(THIS_NAMESCOPE + "/Merge/MergeSummary:0")
                 else:
