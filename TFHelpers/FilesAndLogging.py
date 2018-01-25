@@ -89,18 +89,37 @@ class TensorboardLogHelper:
 
     Does a tf.summary.merge_all so any other summaries added to the graph will also get written to
     the log when writeSummary is called.
+
+    If you are restoring your graph using tf.train.import_meta_graph then this must be constructed
+    after this has been done in order to restore summaries from the existing graph.
     """
-    def __init__(self, logDir, graph, summaryNames: List[str]):
-        self._fileWriter = tf.summary.FileWriter(logDir, graph)
+    def __init__(self, logDir, graph, summaryNames: List[str], shouldRestore: bool):
+        with graph.as_default():
+            self._fileWriter = tf.summary.FileWriter(logDir, graph)
 
-        self._summaryPlaceholders = [tf.placeholder(shape=(), dtype=tf.float32)
-                                     for _ in summaryNames]
-        self._summaries = [tf.summary.scalar(name, placeholder)
-                           for name, placeholder in zip(summaryNames, self._summaryPlaceholders)]
+            THIS_NAMESCOPE = "TensorboardLogHelper"
+            with tf.name_scope(THIS_NAMESCOPE):
+                # If we are restoring from a previous run, get the existing placeholders and summary
+                # else add new placeholders and summaries to the graph
+                if shouldRestore:
+                    self._summaryPlaceholders = [tf.get_default_graph().get_tensor_by_name(THIS_NAMESCOPE+ "/" + name + ":0")
+                                                for name in summaryNames]
+                    self._summaries = tf.get_default_graph().get_tensor_by_name(THIS_NAMESCOPE + "/Merge/MergeSummary:0")
+                else:
+                    self._summaryPlaceholders = [tf.placeholder(shape=(), dtype=tf.float32, name=name)
+                                                for name in summaryNames]
+                    self._summaries = [tf.summary.scalar(name, placeholder)
+                                       for name, placeholder in zip(summaryNames, self._summaryPlaceholders)]
+                    self._summaries = tf.summary.merge_all()
 
-        self._summaries = tf.summary.merge_all()
+            self._iteration = 0
 
-        self._iteration = 0
+    def setIteration(self, iteration: int):
+        """
+        Call this to set the iteration counter manually. If you're restoring from an earlier model
+        run, you'll need to call this once to set it to the epoch that you're restoring from.
+        """
+        self._iteration = iteration
 
     def writeSummary(self, sess, summaryValues: List[float]) -> None:
         """

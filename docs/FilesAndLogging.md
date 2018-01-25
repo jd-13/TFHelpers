@@ -44,10 +44,20 @@ Will write tensorboard logs in the provided directory for all `tf.Summary` nodes
 as `tf.summary.histogram`) and also provides the ability to create additional scalar summaries, such
 as for training loss and validation loss.
 
-    __init__(self, logDir, graph, summaryNames: List[str])
+If you are restoring your graph using `tf.train.import_meta_graph` then this must be constructed
+after this has been done (and therefore after constructing `CheckpointAndRestoreHelper`), otherwise
+`TensorboardLogHelper` will be unable to restore summaries.
+
+    __init__(self, logDir, graph, summaryNames: List[str], shouldRestore: bool)
 Construct this object shortly before your training loop. This creates a `tf.summary.FileWriter` for
 the given `logDir` and `graph`. If you'd like additional scalar summaries that can be manipluated
-during the training loop, provide a list of their names in `summaryNames`
+during the training loop, provide a list of their names in `summaryNames`. Set `shouldRestore` to
+true if you are restoring from a previous run, and `TensorboardLogHelper` will recover existing
+summaries from the previous graph.
+
+    setIteration(self, iteration: int)
+Call this to set the iteration counter manually. If you're restoring from an earlier model
+run, you'll need to call this once to set it to the epoch that you're restoring from.
 
     writeSummary(self, sess, summaryValues: List[float]) -> None
 Writes all summaries in the graph.

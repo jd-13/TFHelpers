@@ -148,14 +148,15 @@ class TFRegressor(SKTFWrapper):
                 self._tensors = self._buildGraph(X.shape[1])
                 self._init = tf.global_variables_initializer()
 
-            tensorboardHelper = TensorboardLogHelper(self._fileManager.getModelDir(),
-                                                     tf.get_default_graph(),
-                                                     ["LossTrain", "LossVal", "BatchTimeAvg"])
-
         stoppingHelper = EarlyStoppingHelper()
         restoreHelper = CheckpointAndRestoreHelper(self._fileManager.getModelDirAndPrefix(),
                                                    self.restoreFrom is not None,
                                                    self._graph)
+
+        tensorboardHelper = TensorboardLogHelper(self._fileManager.getModelDir(),
+                                                 self._graph,
+                                                 ["LossTrain", "LossVal", "BatchTimeAvg"],
+                                                 self.restoreFrom is not None)
 
         self._session = tf.Session(graph=self._graph)
 
@@ -166,6 +167,7 @@ class TFRegressor(SKTFWrapper):
                 self._init.run()
             else:
                 startEpoch = restoreHelper.restoreFromCheckpoint(sess)
+                tensorboardHelper.setIteration(startEpoch)
                 try:
                     self._tensors = self._restoreGraph(self._graph)
                 except KeyError as err:
