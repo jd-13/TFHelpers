@@ -28,6 +28,14 @@ function buildTensorboardCommand(matchingModels) {
     const $tensorboardRow = $("#tensorboardCommandRow");
     $tensorboardRow.empty();
     $tensorboardRow.append("<h3>Tensorboard command:</h3>");
+    $tensorboardRow.append("<a class=\"btn btn-info\" href=\"localhost:6006\" target=\"_blank\">Tensorboard (6006)</a>");
+
+    const $commandCopyBtn = $("<button class=\"btn btn-info\">Copy to Clipboard</button>");
+    $commandCopyBtn.click(() => {
+        document.getElementById("tensorboardCommand").select();
+        document.execCommand("copy");
+    });
+    $tensorboardRow.append($commandCopyBtn);
 
     let logdirString = "";
     matchingModels.forEach(model => {
@@ -35,7 +43,7 @@ function buildTensorboardCommand(matchingModels) {
     });
     logdirString = logdirString.slice(0, -1);
 
-    $tensorboardRow.append(`<small>tensorboard --logdir=${logdirString}</small>`);
+    $tensorboardRow.append(`<br><input id="tensorboardCommand" readonly="readonly" class="commandInput" value="tensorboard --logdir=${logdirString}">`);
 }
 
 let filter = {
@@ -165,6 +173,7 @@ const main = function() {
 
         // Now show the models that match the selected criteria
         $(".filterCheckbox").change(() => {filter.onFilterUpdate()});
+        filter.onFilterUpdate();
     });
 }
 
