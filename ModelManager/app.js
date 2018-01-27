@@ -22,30 +22,6 @@ function buildModelDictFromFile(file) {
     return modelDict;
 }
 
-function buildCheckboxes(modelColumns, models, $filtersRow) {
-    modelColumns.forEach(columnName => {
-        // Get all the possible values for this column
-        let columnValues = new Set();
-        models.forEach(model => {
-            columnValues.add(model[columnName]);
-        });
-
-        // Start building the html element
-        const $columnHtml = $("<div class=\"col-lg-3 col-md-3 col-sm-4 col-xs-12\"></div>");
-        $columnHtml.append($(`<p>${columnName}</p>`));
-        const $columnFieldSet = $(`<fieldset id="${columnName}Checkboxes"></fieldset>`);
-
-        // Add each value to the html element
-        columnValues.forEach(value => {
-            $columnFieldSet.append($(`<input id="${columnName}${value}" value="${value}" type="checkbox" class="filterCheckbox"/>`));
-            $columnFieldSet.append($(`<label for="${columnName}${value}">${value}</label><br>`));
-        });
-
-        $columnHtml.append($columnFieldSet);
-        $filtersRow.append($columnHtml);
-    });
-}
-
 function buildTensorboardCommand(matchingModels) {
     // TODO: remove duplicate logdirs
     // Build the tensorboard command
@@ -62,27 +38,93 @@ function buildTensorboardCommand(matchingModels) {
     $tensorboardRow.append(`<small>tensorboard --logdir=${logdirString}</small>`);
 }
 
-function getMatchingModels(models, selectedValues, $selectedModelsRow) {
-    // TODO: put models with mulitple runs on only one row
-    // For each model, check if it matches the selected values
-    let matchingModels = [];
-    models.forEach(model => {
+let filter = {
+    modelColumns: undefined,
+    models: undefined,
 
-        let matches = true;
-        Object.keys(selectedValues).forEach(columnName => {
+    onFilterUpdate: function() {
+        const $selectedModelsRow = $("#selectedModelsRow");
+        $selectedModelsRow.empty();
+        $selectedModelsRow.append("<h3>Matching models:</h3>");
+    
+        // For each column, get the values that are selected
+        let selectedValues = [];
+        filter.modelColumns.forEach(columnName => {
+            let values = [];
+            $(".filterCheckbox", $(`#${columnName}Checkboxes`)).each(function() {  
+                if (this.checked) {
+                    values.push(this.value);
+                }                  
+            });
+            selectedValues[columnName] = values;
+        });
+    
+        const matchingModels = this.getMatchingModels(filter.models, selectedValues, $selectedModelsRow);         
+    
+        buildTensorboardCommand(matchingModels);
+    },
 
-            if (selectedValues[columnName].indexOf(model[columnName]) < 0) {
-                matches = false;
+    getMatchingModels: function(models, selectedValues, $selectedModelsRow) {
+        // TODO: put models with mulitple runs on only one row
+        // For each model, check if it matches the selected values
+        let matchingModels = [];
+        models.forEach(model => {
+
+            let matches = true;
+            Object.keys(selectedValues).forEach(columnName => {
+
+                if (selectedValues[columnName].indexOf(model[columnName]) < 0) {
+                    matches = false;
+                }
+            });
+
+            if (matches) {
+                matchingModels.push(model);
+                $selectedModelsRow.append(`<small>${model["title"]}&emsp;&emsp;${model["timestamp"]}</small><br>`);
             }
         });
 
-        if (matches) {
-            matchingModels.push(model);
-            $selectedModelsRow.append(`<small>${model["title"]}&emsp;&emsp;${model["timestamp"]}</small><br>`);
-        }
-    });
+        return matchingModels;
+    },
 
-    return matchingModels;
+    buildCheckboxes: function($filtersRow) {
+        this.modelColumns.forEach(columnName => {
+            // Get all the possible values for this column
+            let columnValues = new Set();
+            this.models.forEach(model => {
+                columnValues.add(model[columnName]);
+            });
+    
+            // Start building the html element
+            const $columnHtml = $("<div class=\"col-lg-3 col-md-3 col-sm-4 col-xs-12\"></div>");
+    
+            const columnBtnID = `${columnName}btn`;
+            $columnHtml.append($(`<button id="${columnBtnID}" class="btn btn-info">${columnName}</button>`));
+    
+            const columnFieldSetID = `${columnName}Checkboxes`;
+            const $columnFieldSet = $(`<fieldset id="${columnFieldSetID}"></fieldset>`);
+    
+            // Add each value to the html element
+            columnValues.forEach(value => {
+                const checkboxID = `${columnName}${value}`;
+                $columnFieldSet.append($(`<input id="${checkboxID}" value="${value}" type="checkbox" class="filterCheckbox"/>`));
+                $columnFieldSet.append($(`<label for="${checkboxID}">${value}</label><br>`));
+            });
+    
+            $columnHtml.append($columnFieldSet);
+            $filtersRow.append($columnHtml);
+    
+            // Make clicking the column name toggle the filters
+            $(`#${columnName}btn`).click(() => {
+                checkboxes = $columnFieldSet.children();
+                checkboxes.each(function() {
+                    this.checked = !this.checked;
+                });
+    
+                this.onFilterUpdate();
+            });
+        });
+    }
 }
 
 const main = function() {
@@ -109,38 +151,20 @@ const main = function() {
             }
         });
 
+        filter.models = models;
+
         // Now we build the checkboxes, one column at a time
-        let modelColumns = Object.keys(models[0]);
+        const allModelColumns = Object.keys(models[0]);
 
         // The timestamp and title wouldn't be very useful here
-        modelColumns = modelColumns.filter(element => {
+        filter.modelColumns = allModelColumns.filter(element => {
             return element !== "timestamp" && element !== "title";
         });
 
-        buildCheckboxes(modelColumns, models, $filtersRow);
+        filter.buildCheckboxes($filtersRow);
 
         // Now show the models that match the selected criteria
-        $(".filterCheckbox").change(function(event) {
-            const $selectedModelsRow = $("#selectedModelsRow");
-            $selectedModelsRow.empty();
-            $selectedModelsRow.append("<h3>Matching models:</h3>");
-
-            // For each column, get the values that are selected
-            let selectedValues = [];
-            modelColumns.forEach(columnName => {
-                let values = [];
-                $(".filterCheckbox", $(`#${columnName}Checkboxes`)).each(function() {  
-                    if (this.checked) {
-                        values.push(this.value);
-                    }                  
-                });
-                selectedValues[columnName] = values;
-            });
-
-            const matchingModels = getMatchingModels(models, selectedValues, $selectedModelsRow);         
-
-            buildTensorboardCommand(matchingModels);
-        });
+        $(".filterCheckbox").change(filter.onFilterUpdate());
     });
 }
 
