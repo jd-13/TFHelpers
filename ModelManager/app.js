@@ -164,7 +164,7 @@ const main = function() {
         filter.buildCheckboxes($filtersRow);
 
         // Now show the models that match the selected criteria
-        $(".filterCheckbox").change(filter.onFilterUpdate());
+        $(".filterCheckbox").change(() => {filter.onFilterUpdate()});
     });
 }
 
