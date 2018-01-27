@@ -21,7 +21,7 @@ Download the .whl file for the release marked "Latest Release", and then install
 pip, providing the path to the downloaded wheel:  
 `pip install path/to/TFHelpers-<version>-py3-none-any.whl`
 
-### Colab notebooks
+#### Colab notebooks
 The following will install the v0.0.1 version on a Colab notebook:  
 `!wget https://github.com/jd-13/TFHelpers/releases/download/v0.0.1/TFHelpers-0.0.1-py3-none-any.whl`  
 `!pip install TFHelpers-0.0.1-py3-none-any.whl`
@@ -35,3 +35,6 @@ using pip:
 The additional flags `--upgrade --force-reinstall` are required as the wheel's version numbers are not
 incremented for pre-release builds, and therefore pip will not attempt to upgrade an existing
 TFHelpers installation.
+
+## Contributing
+Feedback and contributions are very welcome, if you find a bug or would like to see a feature added please raise an issue and we can discuss how to resolve it.
