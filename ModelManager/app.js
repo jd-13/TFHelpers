@@ -107,7 +107,7 @@ let filter = {
             // Add each value to the html element
             columnValues.forEach(value => {
                 const checkboxID = `${columnName}${value}`;
-                $columnFieldSet.append($(`<input id="${checkboxID}" value="${value}" type="checkbox" class="filterCheckbox"/>`));
+                $columnFieldSet.append($(`<input id="${checkboxID}" value="${value}" type="checkbox" class="filterCheckbox" checked/>`));
                 $columnFieldSet.append($(`<label for="${checkboxID}">${value}</label><br>`));
             });
     
