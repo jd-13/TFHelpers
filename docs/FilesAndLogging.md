@@ -48,6 +48,10 @@ If you are restoring your graph using `tf.train.import_meta_graph` then this mus
 after this has been done (and therefore after constructing `CheckpointAndRestoreHelper`), otherwise
 `TensorboardLogHelper` will be unable to restore summaries.
 
+Note that this class uses tensorflow's default naming for tensorboard event files, which relies on
+using epoch time to make the file names unique. This means that if several of these objects are
+created within the same second, the last one may overwrite all the others.
+
     __init__(self, logDir, graph, summaryNames: List[str], shouldRestore: bool)
 Construct this object shortly before your training loop. This creates a `tf.summary.FileWriter` for
 the given `logDir` and `graph`. If you'd like additional scalar summaries that can be manipluated
@@ -58,6 +62,8 @@ summaries from the previous graph.
     setIteration(self, iteration: int)
 Call this to set the iteration counter manually. If you're restoring from an earlier model
 run, you'll need to call this once to set it to the epoch that you're restoring from.
+
+Starts from 0 (the first epoch would be iteration 0).
 
     writeSummary(self, sess, summaryValues: List[float]) -> None
 Writes all summaries in the graph.
