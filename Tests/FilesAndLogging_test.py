@@ -3,13 +3,16 @@ Tests for functionality in the FilesAndLogging module.
 """
 
 from datetime import datetime
+import glob
 import os
 import pathlib
 import pytest
+import time
 
 import tensorflow as tf
+from tensorboard.backend.event_processing import event_accumulator
 
-from TFHelpers.FilesAndLogging import CheckpointAndRestoreHelper, FileManager
+from TFHelpers.FilesAndLogging import CheckpointAndRestoreHelper, FileManager, TensorboardLogHelper
 
 class Test_CheckpointAndRestoreHelper:
     """
@@ -128,7 +131,7 @@ class Test_CheckpointAndRestoreHelper:
             restoreHelper.restoreFromCheckpoint(sess)
             assert A.eval() == 10
             assert B.eval() == 15
-        
+
     def test_RestoreMetaFail(self, request):
         """
         Tests if the model fails to restore correctly when there is no meta graph to restore from.
@@ -165,3 +168,150 @@ class Test_FileManager:
 
         assert manager.getModelDir() == os.getcwd() + "/models/TestRegressor/" +  RESTORE_FROM
         assert manager.getModelDirAndPrefix() == os.getcwd() + "/models/TestRegressor/" + RESTORE_FROM + "/model"
+
+class Test_TensorboardLogHelper:
+    """
+    Tests for the TensorboardLogHelper class.
+    """
+    def test_WriteLogs(self, request):
+        """
+        Tests that log files are created in the correct location.
+        """
+        tf.reset_default_graph()
+
+        MODEL_DIR = request.node.name
+        START_DATETIME = datetime.utcnow().strftime("%Y%m%d-%H%M")
+        manager = FileManager(MODEL_DIR)
+        logHelper = TensorboardLogHelper(manager.getModelDir(),
+                                         tf.get_default_graph(),
+                                         ["summ"],
+                                         False)
+
+        with tf.Session() as sess:
+            logHelper.writeSummary(sess, [0])
+
+        logHelper.close()
+
+        assert glob.glob(str(pathlib.Path.cwd() / "models" / MODEL_DIR / START_DATETIME / "events.out.tfevents.") + "*")
+
+
+    def test_IncorrectSummaries(self, request):
+        """
+        Tests that providing an incorrect number of summary values causes an exception.
+        """
+        tf.reset_default_graph()
+
+        manager = FileManager(request.node.name)
+        logHelper = TensorboardLogHelper(manager.getModelDir(),
+                                         tf.get_default_graph(),
+                                         ["summ"],
+                                         False)
+        
+        with tf.Session() as sess:
+            with pytest.raises(ValueError):
+                logHelper.writeSummary(sess, [0, 1])
+
+        logHelper.close()
+
+    def test_WriteStaticAndDynamicSummaries(self, request):
+        """
+        Tests that both static and dynamic summaries are written for several iterations.
+        """
+        tf.reset_default_graph()
+
+        # Build a simple graph with one statically defined summary
+        A = tf.Variable(10, dtype=tf.float32, name="A")
+        tf.summary.scalar("static", A)
+        init = tf.global_variables_initializer()
+
+        # Setup our helpers, use a single dynamic summary
+        MODEL_DIR = request.node.name
+        START_DATETIME = datetime.utcnow().strftime("%Y%m%d-%H%M")
+        manager = FileManager(MODEL_DIR)
+        logHelper = TensorboardLogHelper(manager.getModelDir(),
+                                         tf.get_default_graph(),
+                                         ["dynamic"],
+                                         False)
+
+        with tf.Session() as sess:
+            init.run()
+            logHelper.writeSummary(sess, [5.0])
+
+        logHelper.close()
+
+        # Manually inspect the tensorboard log
+        ea = event_accumulator.EventAccumulator(str(pathlib.Path.cwd() / "models" / MODEL_DIR / START_DATETIME))
+        ea.Reload()
+        assert ea.Scalars("static")[0].value == 10
+        assert ea.Scalars("TensorboardLogHelper/dynamic_1")[0].value == 5
+
+
+    def test_RestoreIncorrectSummaries(self, request):
+        """
+        Tests that an exception is thrown if a summary name is provided which couldn't be found in
+        the graph. This could happen where a one of the summary names provided to the constructor
+        Didn't exist in the previous run.
+        """
+        tf.reset_default_graph()
+        
+        # Setup our helpers, use a single summary
+        MODEL_DIR = request.node.name
+        START_DATETIME = datetime.utcnow().strftime("%Y%m%d-%H%M")
+        manager = FileManager(MODEL_DIR)
+        logHelper = TensorboardLogHelper(manager.getModelDir(),
+                                         tf.get_default_graph(),
+                                         ["test1"],
+                                         False)
+
+        # Write once
+        with tf.Session() as sess:
+            logHelper.writeSummary(sess, [5.0])
+
+        logHelper.close()
+
+        # Now restore, but using an incorrect session name
+        with pytest.raises(KeyError):
+            logHelper = TensorboardLogHelper(manager.getModelDir(),
+                                            tf.get_default_graph(),
+                                            ["test2"],
+                                            True)
+
+    def test_SuccessfulRestore(self, request):
+        """
+        Tests that when restoring from a previous session new events are correctly appended.
+        """
+        tf.reset_default_graph()
+        
+        # Setup our helpers, use a single summary
+        MODEL_DIR = request.node.name
+        START_DATETIME = datetime.utcnow().strftime("%Y%m%d-%H%M")
+        manager = FileManager(MODEL_DIR)
+        logHelper = TensorboardLogHelper(manager.getModelDir(),
+                                         tf.get_default_graph(),
+                                         ["test1"],
+                                         False)
+
+        # Write once
+        with tf.Session() as sess:
+            logHelper.writeSummary(sess, [5.0])
+
+        logHelper.close()
+
+        # Now restore (wait one second otherwise the files will have the first one will be overwritten)
+        time.sleep(1)
+        logHelper = TensorboardLogHelper(manager.getModelDir(),
+                                         tf.get_default_graph(),
+                                         ["test1"],
+                                         True)
+        # Write again
+        with tf.Session() as sess:
+            logHelper.setIteration(1)
+            logHelper.writeSummary(sess, [6.0])
+
+        logHelper.close()
+
+        # Manually inspect the tensorboard log
+        ea = event_accumulator.EventAccumulator(str(pathlib.Path.cwd() / "models" / MODEL_DIR / START_DATETIME))
+        ea.Reload()
+        assert ea.Scalars("TensorboardLogHelper/test1_1")[0].value == 5
+        assert ea.Scalars("TensorboardLogHelper/test1_1")[1].value == 6
