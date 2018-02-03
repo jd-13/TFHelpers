@@ -119,10 +119,10 @@ class Test_ProgressCalculator_Operation:
 
         # Check that the interval doesn't have any affect
         progress.updateInterval(1)
-        
+
         time.sleep(1.001)
         assert progress.timeTaken()[:9] == "0:00:03.0"
-    
+
     def test_CorrectTimeRemaining_ConstantSpeed(self):
         """
         ProgressCalculator should provide an estimate of the time remaining for a constant time
@@ -146,7 +146,6 @@ class Test_ProgressCalculator_Operation:
         assert progress.getTimeStampRemaining() == "0:00:00"
         assert progress.getSecondsRemaining() == pytest.approx(0, 0.1)
 
-    
     def test_CorrectTimeRemaining_VaryingSpeed(self):
         """
         ProgressCalculator should provide an estimate of the time remaining for a varying time
@@ -220,7 +219,7 @@ class Test_EarlyStoppingHelper:
 
     def test_StopAndRestore_Increasing(self):
         """
-        Simulates a decreasing loss for several iterations, then a loss which increases. The 
+        Simulates a decreasing loss for several iterations, then a loss which increases. The
         helper should signal the need to stop after the correct number of iterations.
         """
         stoppingHelper = EarlyStoppingHelper(3)
@@ -275,7 +274,7 @@ class Test_TrainingValidator:
         tf.reset_default_graph()
         X_in = tf.placeholder(shape=(None, NUM_FEATURES), dtype=tf.float32)
         y_in = tf.placeholder(shape=(None), dtype=tf.float32)
-        
+
         layer1 = tf.layers.dense(X_in, units=NUM_FEATURES)
 
         # Don't connect the next layer, this is what will cause the warning
@@ -312,9 +311,9 @@ class Test_TrainingValidator:
         NUM_FEATURES = 10
         X_in = tf.placeholder(shape=(None, NUM_FEATURES), dtype=tf.float32)
         y_in = tf.placeholder(shape=(None), dtype=tf.float32)
-        
+
         layer1 = tf.layers.dense(X_in, units=NUM_FEATURES)
-        
+
         mse = tf.reduce_mean(tf.square(layer1 - y_in), name="mse")
         trainingOp = tf.train.AdamOptimizer(learning_rate=0.01).minimize(mse)
 
