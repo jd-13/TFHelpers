@@ -81,7 +81,6 @@ class ProgressCalculator:
         """Reset the timer and all internal counters"""
         self._itersPerSecond = 0
         self._completedIterations = 0
-        self._targetIterations = 0
         self._startEpochTime = 0
 
     def updateInterval(self, newlyCompletedIterations: float) -> None:
