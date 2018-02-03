@@ -82,8 +82,7 @@ class BasicRegressor(TFRegressor):
                                 graph.get_operation_by_name("train/trainingOp"),
                                 graph.get_tensor_by_name("dnn/keep_prob:0"))
 
-    def _buildModelName(self):
-        return self.__class__.__name__ + "-H-" + "_".join(str(value)
-                                                          for value in self.hiddenNeuronsList) \
-                                       + "-I-" + self._mapInitializerName(self.initializer) \
-                                       + "-D-" + str(self.dropoutRate)
+    def _buildHyperParamsDict(self):
+        return {"H": "_".join(str(value) for value in self.hiddenNeuronsList),
+                "I": self._mapInitializerName(self.initializer),
+                "D": str(self.dropoutRate)}

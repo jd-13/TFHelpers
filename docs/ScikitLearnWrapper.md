@@ -11,8 +11,8 @@ provide further functionality. Currently only `TFRegressor` is available.
 
 ## TFRegressor
 If you wish to create a regression model you can inherit from the `TFRegressor` class which provides
-a lot of functionality, leaving the methods `_buildGraph`, `_restoreGraph`, `_buildModelName`, and
-the constructor for you to implement.
+a lot of functionality, leaving the methods `_buildGraph`, `_restoreGraph`, `_buildHyperParamsDict`,
+and the constructor for you to implement.
 
 Using `TFRegressor` gets you the following features for free:
 
@@ -39,9 +39,11 @@ and should call `TFRegressor.__init__` to provide the hyperparameters required b
 *NOTE: For compatitbility with scikit-learn functionality such as `GridSearchCV`, every parameter
 passed to the constructor of your model must be saved to a member variable of exactly the same name.*
 
-    _buildModelName(self)
-In this method you will need to return a string which adequately describes your model and its
-hyperparameters. This string is used to group model files.
+    _buildHyperParamsDict(self) -> Dict[str, str]
+In this method you will need to return a dict of strings which adequately describes your model and
+its hyperparameters. This string is used to group model files. You have a lot of freedom as to how
+to do this, but the recommended approach is to provide short abbreviations of your hyperparameter
+names as the dict keys and the corresponding hyperparameter values as the dict values.
 
     _buildGraph(self, numFeatures)
 In this method you will need to build the graph for your model, and return a `RegressorTensors`
