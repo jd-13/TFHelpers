@@ -13,6 +13,10 @@ Documentation is available [here](https://jd-13.github.io/TFHelpers/)
 * scikit-learn
 * numpy
 
+TFHelpers is tested and developed on a macOS and Linux environment, so some features may not work as
+expected on Windows. If you find something that doesn't work properly on Windows, please raise an
+issue.
+
 ### Installation
 Built wheel files are uploaded to the releases page, where the latest stable release is marked
 "Latest Release", and development builds are marked "Pre-release".
@@ -37,4 +41,5 @@ incremented for pre-release builds, and therefore pip will not attempt to upgrad
 TFHelpers installation.
 
 ## Contributing
-Feedback and contributions are very welcome, if you find a bug or would like to see a feature added please raise an issue and we can discuss how to resolve it.
+Feedback and contributions are very welcome, if you find a bug or would like to see a feature added
+please raise an issue and we can discuss how to resolve it.
