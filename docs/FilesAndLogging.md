@@ -59,7 +59,7 @@ during the training loop, provide a list of their names in `summaryNames`. Set `
 true if you are restoring from a previous run, and `TensorboardLogHelper` will recover existing
 summaries from the previous graph.
 
-    setIteration(self, iteration: int)
+    setIteration(self, iteration: int) -> None
 Call this to set the iteration counter manually. If you're restoring from an earlier model
 run, you'll need to call this once to set it to the epoch that you're restoring from.
 
