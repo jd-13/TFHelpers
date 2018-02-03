@@ -180,7 +180,7 @@ class TFRegressor(SKTFWrapper):
                     print([n.name for n in self._graph.as_graph_def().node])
                     print("\n" + str(err))
                     print("\nThe available tensors/ops have been printed above this error")
-                    sys.exit()
+                    raise RuntimeError("Model failed to restore")
 
             progressCalc = ProgressCalculator(numEpochs - startEpoch)
             progressCalc.start()
