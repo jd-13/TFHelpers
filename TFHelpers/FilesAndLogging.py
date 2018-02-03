@@ -59,7 +59,8 @@ class FileManager:
         """
 
         if restoreFrom is None:
-            self._modelDir = pathlib.Path.cwd() / "models" / modelName / datetime.utcnow().strftime("%Y%m%d-%H%M")
+            self._modelDir = pathlib.Path.cwd() / "models" / modelName / \
+                             datetime.utcnow().strftime("%Y%m%d-%H%M")
             self._modelDir.mkdir(parents=True, exist_ok=True)
         else:
             self._modelDir = pathlib.Path.cwd() / "models" / modelName / restoreFrom
@@ -104,12 +105,14 @@ class TensorboardLogHelper:
                 if shouldRestore:
                     self._summaryPlaceholders = [tf.get_default_graph().get_tensor_by_name(THIS_NAMESCOPE + "/" + name + ":0")
                                                  for name in summaryNames]
-                    self._summaries = tf.get_default_graph().get_tensor_by_name(THIS_NAMESCOPE + "/Merge/MergeSummary:0")
+                    self._summaries = tf.get_default_graph().get_tensor_by_name(
+                        THIS_NAMESCOPE + "/Merge/MergeSummary:0")
                 else:
                     self._summaryPlaceholders = [tf.placeholder(shape=(), dtype=tf.float32, name=name)
                                                  for name in summaryNames]
                     self._summaries = [tf.summary.scalar(name, placeholder)
-                                       for name, placeholder in zip(summaryNames, self._summaryPlaceholders)]
+                                       for name, placeholder in
+                                       zip(summaryNames, self._summaryPlaceholders)]
                     self._summaries = tf.summary.merge_all()
 
             self._iteration = 0

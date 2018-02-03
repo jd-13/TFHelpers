@@ -6,8 +6,6 @@ from datetime import datetime
 import os
 import pathlib
 
-from sklearn.datasets import make_regression
-
 import tensorflow as tf
 
 from TFHelpers.FilesAndLogging import CheckpointAndRestoreHelper, FileManager
@@ -52,7 +50,7 @@ class Test_CheckpointAndRestoreHelper:
         A = tf.Variable(10, dtype=tf.float32)
         B = tf.Variable(15, dtype=tf.float32)
         init = tf.global_variables_initializer()
-        
+
         # Setup our helpers
         MODEL_DIR = "test_FileCreation"
         START_DATETIME = datetime.utcnow().strftime("%Y%m%d-%H%M")

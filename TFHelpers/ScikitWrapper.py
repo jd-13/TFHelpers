@@ -1,3 +1,6 @@
+"""
+Provides scikit-learn style wrappers for tensorflow models.
+"""
 import sys
 import time
 
