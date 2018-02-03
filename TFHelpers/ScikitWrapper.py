@@ -171,6 +171,9 @@ class TFRegressor(SKTFWrapper):
             else:
                 startEpoch = restoreHelper.restoreFromCheckpoint(sess)
                 tensorboardHelper.setIteration(startEpoch)
+
+                # This call to restore the graph doesn't need to be done inside the session,
+                # may be better to move it outside the session
                 try:
                     self._tensors = self._restoreGraph(self._graph)
                 except KeyError as err:
