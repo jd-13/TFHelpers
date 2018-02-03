@@ -117,7 +117,7 @@ class TensorboardLogHelper:
 
             self._iteration = 0
 
-    def setIteration(self, iteration: int):
+    def setIteration(self, iteration: int) -> None:
         """
         Call this to set the iteration counter manually. If you're restoring from an earlier model
         run, you'll need to call this once to set it to the epoch that you're restoring from.
