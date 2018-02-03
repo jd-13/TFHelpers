@@ -3,6 +3,7 @@ Provides scikit-learn style wrappers for tensorflow models.
 """
 import sys
 import time
+from typing import Dict
 
 import numpy as np
 
@@ -130,13 +131,25 @@ class TFRegressor(SKTFWrapper):
         """
         raise NotImplementedError()
 
-    def _buildModelName(self):
+    def _buildHyperParamsDict(self) -> Dict[str, str]:
         """
-        Return a url/filename safe string describing the model type and its hyperparameters
+        Return a dict of strings, where the keys are around 1 to 4 character abbreviations of
+        hyperparameter names, and the values are the corresponding hyperparameter values.
 
         ** Derived classes should implement this **
         """
         raise NotImplementedError()
+
+    def _buildModelNameStr(self) -> str:
+        """
+        Return a url/filename safe string describing the model type and its hyperparameters
+        """
+        modelName = self.__class__.__name__
+        paramsDict = self._buildHyperParamsDict()
+        for key in paramsDict.keys():
+            modelName += "-" + key + "-" + paramsDict[key]
+
+        return modelName
 
     def fit(self, X, y, X_valid, y_valid, numEpochs=1):
         """Fits the model on the training set"""
@@ -144,7 +157,7 @@ class TFRegressor(SKTFWrapper):
 
         # This must be initialised during fit for sklearn's grid search to call it at the correct
         # time
-        self._fileManager = FileManager(self._buildModelName(), self.restoreFrom)
+        self._fileManager = FileManager(self._buildModelNameStr(), self.restoreFrom)
 
         with self._graph.as_default():
             if self.restoreFrom is None:
