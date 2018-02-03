@@ -170,11 +170,24 @@ the format <code>YYYYMMDD-HHMM</code>.</p>
 <p>Will write tensorboard logs in the provided directory for all <code>tf.Summary</code> nodes in the graph (such
 as <code>tf.summary.histogram</code>) and also provides the ability to create additional scalar summaries, such
 as for training loss and validation loss.</p>
-<pre><code>__init__(self, logDir, graph, summaryNames: List[str])
+<p>If you are restoring your graph using <code>tf.train.import_meta_graph</code> then this must be constructed
+after this has been done (and therefore after constructing <code>CheckpointAndRestoreHelper</code>), otherwise
+<code>TensorboardLogHelper</code> will be unable to restore summaries.</p>
+<p>Note that this class uses tensorflow's default naming for tensorboard event files, which relies on
+using epoch time to make the file names unique. This means that if several of these objects are
+created within the same second, the last one may overwrite all the others.</p>
+<pre><code>__init__(self, logDir, graph, summaryNames: List[str], shouldRestore: bool)
 </code></pre>
 <p>Construct this object shortly before your training loop. This creates a <code>tf.summary.FileWriter</code> for
 the given <code>logDir</code> and <code>graph</code>. If you'd like additional scalar summaries that can be manipluated
-during the training loop, provide a list of their names in <code>summaryNames</code></p>
+during the training loop, provide a list of their names in <code>summaryNames</code>. Set <code>shouldRestore</code> to
+true if you are restoring from a previous run, and <code>TensorboardLogHelper</code> will recover existing
+summaries from the previous graph.</p>
+<pre><code>setIteration(self, iteration: int)
+</code></pre>
+<p>Call this to set the iteration counter manually. If you're restoring from an earlier model
+run, you'll need to call this once to set it to the epoch that you're restoring from.</p>
+<p>Starts from 0 (the first epoch would be iteration 0).</p>
 <pre><code>writeSummary(self, sess, summaryValues: List[float]) -&gt; None
 </code></pre>
 <p>Writes all summaries in the graph.</p>
