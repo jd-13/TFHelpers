@@ -183,7 +183,7 @@ the given <code>logDir</code> and <code>graph</code>. If you'd like additional s
 during the training loop, provide a list of their names in <code>summaryNames</code>. Set <code>shouldRestore</code> to
 true if you are restoring from a previous run, and <code>TensorboardLogHelper</code> will recover existing
 summaries from the previous graph.</p>
-<pre><code>setIteration(self, iteration: int)
+<pre><code>setIteration(self, iteration: int) -&gt; None
 </code></pre>
 <p>Call this to set the iteration counter manually. If you're restoring from an earlier model
 run, you'll need to call this once to set it to the epoch that you're restoring from.</p>
