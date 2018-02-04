@@ -138,8 +138,8 @@ in the <code>fit</code> method. The <code>SciKitWrapper</code> module also conta
 provide further functionality. Currently only <code>TFRegressor</code> is available.</p>
 <h2 id="tfregressor">TFRegressor</h2>
 <p>If you wish to create a regression model you can inherit from the <code>TFRegressor</code> class which provides
-a lot of functionality, leaving the methods <code>_buildGraph</code>, <code>_restoreGraph</code>, <code>_buildModelName</code>, and
-the constructor for you to implement.</p>
+a lot of functionality, leaving the methods <code>_buildGraph</code>, <code>_restoreGraph</code>, <code>_buildHyperParamsDict</code>,
+and the constructor for you to implement.</p>
 <p>Using <code>TFRegressor</code> gets you the following features for free:</p>
 <ul>
 <li>A fairly conventional training loop, with user specified batch size</li>
@@ -164,10 +164,12 @@ the constructor for you to implement.</p>
 and should call <code>TFRegressor.__init__</code> to provide the hyperparameters required by the <code>TFRegressor</code>.</p>
 <p><em>NOTE: For compatitbility with scikit-learn functionality such as <code>GridSearchCV</code>, every parameter
 passed to the constructor of your model must be saved to a member variable of exactly the same name.</em></p>
-<pre><code>_buildModelName(self)
+<pre><code>_buildHyperParamsDict(self) -&gt; Dict[str, str]
 </code></pre>
-<p>In this method you will need to return a string which adequately describes your model and its
-hyperparameters. This string is used to group model files.</p>
+<p>In this method you will need to return a dict of strings which adequately describes your model and
+its hyperparameters. This string is used to group model files. You have a lot of freedom as to how
+to do this, but the recommended approach is to provide short abbreviations of your hyperparameter
+names as the dict keys and the corresponding hyperparameter values as the dict values.</p>
 <pre><code>_buildGraph(self, numFeatures)
 </code></pre>
 <p>In this method you will need to build the graph for your model, and return a <code>RegressorTensors</code>
@@ -181,6 +183,11 @@ method.</p>
 <p>This method must also return a <code>RegressorTensors</code> object, however the tensors provided to the
 constructor of <code>RegressorTensors</code> must be recovered from the provided <code>graph</code> using either
 <code>graph.get_tensor_by_name(...)</code> or <code>graph.get_operation_by_name(...)</code>.</p>
+<p>For complete examples of all of the above methods, see <code>SKTFModels.BasicRegressor</code>.</p>
+<pre><code>_onEpochComplete(self, sess) -&gt; None:
+</code></pre>
+<p>Unlike the above implementation of this method is optional. This will be called at the end of each
+epoch</p>
 <pre><code>RegressorTensors(self,
                  X_in,
                  y_in,
@@ -199,7 +206,6 @@ training loop will use while training the model. Each is explained below:</p>
 <li><code>trainingOp</code>: The operator that should be evaluated for each batch and epoch to train your model</li>
 <li><code>dropoutKeepProb</code>: A <code>tf.Placeholder</code> which will be set to the dropout rate during training</li>
 </ul>
-<p>For complete examples of all of the above methods, see <code>SKTFModels.BasicRegressor</code>.</p>
 <h3 id="usage">Usage</h3>
 <p>The interface to train models which inherit from <code>TFRegressor</code> is the <code>fit</code> and <code>predict</code> methods.</p>
 <pre><code>fit(self, X, y, X_valid, y_valid, numEpochs)
