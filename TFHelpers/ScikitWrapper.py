@@ -81,8 +81,8 @@ class TFRegressor(SKTFWrapper):
     Derived classes must:
     - Provide a constructor which calls the constructor of this class
     - Implement a _buildGraph method which assigns a RegressorTensors object to the _tensors member
-    - Implement a _buildModelName method which returns a url/filename safe string describing the
-      model type and its hyperparameters
+    - Implement a _buildModelNameStr method which returns a dict of strings describing the model
+      type and its hyperparameters
     """
 
     def __init__(self,
