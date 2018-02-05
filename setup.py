@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="TFHelpers",
-    version='0.0.1',
+    version='0.1.0',
     description="Small collection of classes which implement common tasks in Tensorflow",
     #long_description=long_description,
     url="https://github.com/jd-13/TFHelpers",

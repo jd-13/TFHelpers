@@ -26,9 +26,9 @@ pip, providing the path to the downloaded wheel:
 `pip install path/to/TFHelpers-<version>-py3-none-any.whl`
 
 #### Colab notebooks
-The following will install the v0.0.1 version on a Colab notebook:  
-`!wget https://github.com/jd-13/TFHelpers/releases/download/v0.0.1/TFHelpers-0.0.1-py3-none-any.whl`  
-`!pip install TFHelpers-0.0.1-py3-none-any.whl`
+The following will install the v0.1.0 version on a Colab notebook:  
+`!wget https://github.com/jd-13/TFHelpers/releases/download/v0.1.0/TFHelpers-0.1.0-py3-none-any.whl`  
+`!pip install TFHelpers-0.1.0-py3-none-any.whl`
 
 #### Pre-release builds (not recommended)
 If you wish to use features which are included in a pre-release build but not yet a stable release,
