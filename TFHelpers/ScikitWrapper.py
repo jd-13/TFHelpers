@@ -151,6 +151,13 @@ class TFRegressor(SKTFWrapper):
 
         return modelName
 
+    def _onEpochComplete(self, numEpoch) -> None:
+        """
+        If you need to do any processing at the end of each epoch override this method. numEpoch is
+        the number of epochs completed starting from 0.
+        """
+        pass
+
     def fit(self, X, y, X_valid, y_valid, numEpochs=1):
         """Fits the model on the training set"""
         self._closeSession()
@@ -228,6 +235,8 @@ class TFRegressor(SKTFWrapper):
 
                 if epoch < 2:
                     trainingValidator.validate(lossVal)
+
+                self._onEpochComplete(epoch)
 
                 # This must be the last thing done in an epoch
                 if stoppingHelper.shouldStop(lossVal):

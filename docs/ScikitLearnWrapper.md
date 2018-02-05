@@ -59,6 +59,12 @@ This method must also return a `RegressorTensors` object, however the tensors pr
 constructor of `RegressorTensors` must be recovered from the provided `graph` using either
 `graph.get_tensor_by_name(...)` or `graph.get_operation_by_name(...)`.
 
+For complete examples of all of the above methods, see `SKTFModels.BasicRegressor`.
+
+    _onEpochComplete(self, numEpoch) -> None
+This is an optional method which you can override to perform a task at the end of each epoch.
+`numEpoch` is the current epoch starting from 0.
+
     RegressorTensors(self,
                      X_in,
                      y_in,
@@ -76,8 +82,6 @@ training loop will use while training the model. Each is explained below:
 * `loss`: The loss of your graph. `loss.eval(...)` will be called to create training and validation loss values to log in tensorboard
 * `trainingOp`: The operator that should be evaluated for each batch and epoch to train your model
 * `dropoutKeepProb`: A `tf.Placeholder` which will be set to the dropout rate during training
-
-For complete examples of all of the above methods, see `SKTFModels.BasicRegressor`.
 
 ### Usage
 The interface to train models which inherit from `TFRegressor` is the `fit` and `predict` methods.
