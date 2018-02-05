@@ -184,10 +184,10 @@ method.</p>
 constructor of <code>RegressorTensors</code> must be recovered from the provided <code>graph</code> using either
 <code>graph.get_tensor_by_name(...)</code> or <code>graph.get_operation_by_name(...)</code>.</p>
 <p>For complete examples of all of the above methods, see <code>SKTFModels.BasicRegressor</code>.</p>
-<pre><code>_onEpochComplete(self, sess) -&gt; None:
+<pre><code>_onEpochComplete(self, numEpoch) -&gt; None
 </code></pre>
-<p>Unlike the above implementation of this method is optional. This will be called at the end of each
-epoch</p>
+<p>This is an optional method which you can override to perform a task at the end of each epoch.
+<code>numEpoch</code> is the current epoch starting from 0.</p>
 <pre><code>RegressorTensors(self,
                  X_in,
                  y_in,
