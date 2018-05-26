@@ -49,6 +49,8 @@ def removeTrainingNodesFromProtoBufGraph(modelDir: str,
                                          tensorflowPath: str):
     """
     Removes training nodes from a protobuf graph def.
+
+    modelDir must be an absolute path.
     """
 
     TRANSFORM_PATH = "tensorflow/tools/graph_transforms:transform_graph --"
